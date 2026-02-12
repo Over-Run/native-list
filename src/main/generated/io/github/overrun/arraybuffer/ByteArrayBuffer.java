@@ -1,0 +1,59 @@
+// This file is auto-generated. DO NOT EDIT!
+package io.github.overrun.arraybuffer;
+import java.lang.foreign.*;
+import java.util.*;
+public class ByteArrayBuffer extends ArrayBuffer {
+    public ByteArrayBuffer(Allocator allocator, long initialCapacity) {
+        super(ValueLayout.JAVA_BYTE, allocator, initialCapacity);
+    }
+
+    public ByteArrayBuffer(Allocator allocator) {
+        super(ValueLayout.JAVA_BYTE, allocator);
+    }
+
+    public byte get(long index) {
+        Objects.checkIndex(index, size);
+        return data.getAtIndex(ValueLayout.JAVA_BYTE, index);
+    }
+
+    public void add(byte value) {
+        ensureCapacity(size + 1);
+        data.setAtIndex(ValueLayout.JAVA_BYTE, size, value);
+        size++;
+    }
+
+    public void add(long index, byte value) {
+        if (index == size) {
+            add(value);
+            return;
+        }
+
+        Objects.checkIndex(index, size + 1);
+        ensureCapacity(size + 1);
+        move(index, index + 1);
+        data.setAtIndex(ValueLayout.JAVA_BYTE, index, value);
+        size++;
+    }
+
+    public void addAll(byte[] values) {
+        ensureCapacity(size + values.length);
+        MemorySegment.copy(values, 0, data, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE.scale(0, size), values.length);
+        size += values.length;
+    }
+
+    public void addAll(long index, byte[] values) {
+        if (index == size) {
+            addAll(values);
+            return;
+        }
+
+        Objects.checkIndex(index, size + values.length);
+        ensureCapacity(size + values.length);
+        move(index, index + values.length);
+        MemorySegment.copy(values, 0, data, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE.scale(0, index), values.length);
+        size += values.length;
+    }
+
+    public byte[] toArray() { return data().toArray(ValueLayout.JAVA_BYTE); }
+    @Override public ValueLayout.OfByte elementLayout() { return ValueLayout.JAVA_BYTE; }
+}
