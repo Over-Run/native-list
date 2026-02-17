@@ -1,13 +1,13 @@
 // This file is auto-generated. DO NOT EDIT!
-package io.github.overrun.arraybuffer;
+package io.github.overrun.nativelist;
 import java.lang.foreign.*;
 import java.util.*;
-public class IntArrayBuffer extends ArrayBuffer {
-    public IntArrayBuffer(Allocator allocator, long initialCapacity) {
+public class IntNativeList extends NativeList {
+    public IntNativeList(Allocator allocator, long initialCapacity) {
         super(ValueLayout.JAVA_INT, allocator, initialCapacity);
     }
 
-    public IntArrayBuffer(Allocator allocator) {
+    public IntNativeList(Allocator allocator) {
         super(ValueLayout.JAVA_INT, allocator);
     }
 

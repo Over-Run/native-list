@@ -1,3 +1,3 @@
-rootProject.name = "array-buffer"
+rootProject.name = "native-list"
 
 include("gen")

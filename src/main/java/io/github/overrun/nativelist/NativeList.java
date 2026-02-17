@@ -1,14 +1,15 @@
-package io.github.overrun.arraybuffer;
+package io.github.overrun.nativelist;
 
-import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/// A resizable array backed by a [MemorySegment].
+///
 /// @since 1.0.0
-public class ArrayBuffer implements ArrayBufferView, AutoCloseable {
+public class NativeList implements NativeListView, AutoCloseable {
     private final MemoryLayout elementLayout;
     private final Allocator allocator;
     protected MemorySegment data;
@@ -16,40 +17,98 @@ public class ArrayBuffer implements ArrayBufferView, AutoCloseable {
     protected long size = 0;
 
     public interface Allocator {
+        /// Allocates a block of memory with the given size and alignment constraint.
+        ///
+        /// The implementation **MUST NOT** return [MemorySegment#NULL].
+        /// They should instead raise [OutOfMemoryError].
+        ///
+        /// @param byteSize      the size of the memory to be allocated in bytes
+        /// @param byteAlignment the alignment constraint in bytes
+        /// @throws IllegalArgumentException if `bytesSize < 0`, `byteAlignment <= 0`, or if `byteAlignment` is not a power of 2
+        /// @throws OutOfMemoryError         if error occurs when allocating memory
         MemorySegment allocate(long byteSize, long byteAlignment);
 
-        MemorySegment reallocate(MemorySegment segment, long newByteSize);
+        /// Allocates a block of memory with the contents of the given memory segment and the alignment constraint.
+        ///
+        /// The implementation **MUST NOT** return [MemorySegment#NULL].
+        /// They should instead raise [OutOfMemoryError].
+        ///
+        /// @param segment       the memory segment to be copied
+        /// @param byteAlignment the alignment constraint in bytes
+        /// @throws IllegalArgumentException if `byteAlignment <= 0`, or if `byteAlignment` is not a power of 2
+        /// @throws OutOfMemoryError         if error occurs when allocating memory
+        MemorySegment allocateFrom(MemorySegment segment, long byteAlignment);
 
+        /// Reallocates the memory segment with a new size.
+        ///
+        /// The implementation **can only** return [MemorySegment#NULL] when `newByteSize == 0`.
+        /// Otherwise, they should instead raise [OutOfMemoryError].
+        ///
+        /// @param segment       the memory segment to be reallocated, which **may** be [MemorySegment#NULL]
+        /// @param newByteSize   the new size in bytes, which **may** be smaller than the previous one
+        /// @param byteAlignment the alignment constraint in bytes
+        /// @throws IllegalArgumentException if `bytesSize < 0`, `byteAlignment <= 0`, or if `byteAlignment` is not a power of 2
+        /// @throws OutOfMemoryError         if error occurs when reallocating memory
+        MemorySegment reallocate(MemorySegment segment, long newByteSize, long byteAlignment);
+
+        /// Releases the given memory segment or the arena associated to this allocator.
+        ///
+        /// This method does no operation if `segment` is [MemorySegment#NULL].
+        ///
+        /// @param segment the memory segment to be released, which **may** be [MemorySegment#NULL]
         void free(MemorySegment segment);
 
         static Allocator ofConfinedArena() {
-            return new ArenaAllocator(Arena::ofConfined, true);
+            return ArenaAllocator.ofConfined();
         }
 
         static Allocator ofSharedArena() {
-            return new ArenaAllocator(Arena::ofShared, true);
+            return ArenaAllocator.ofShared();
         }
 
         static Allocator ofAutoArena() {
-            return new ArenaAllocator(Arena::ofAuto, true);
+            return ArenaAllocator.ofAuto();
+        }
+
+        static Allocator c() {
+            return CAllocator.of();
         }
     }
 
-    public ArrayBuffer(MemoryLayout elementLayout, Allocator allocator, long initialCapacity) {
+    @FunctionalInterface
+    public interface AllocatorFactory {
+        Allocator create();
+    }
+
+    public NativeList(MemoryLayout elementLayout, AllocatorFactory allocatorFactory, long initialCapacity) {
+        this.elementLayout = elementLayout;
+        this.capacity = initialCapacity;
+        this.data = MemorySegment.NULL;
+        this.allocator = allocatorFactory.create();
         if (initialCapacity > 0) {
             this.data = allocator.allocate(elementLayout.scale(0, initialCapacity), elementLayout.byteAlignment());
-        } else if (initialCapacity == 0) {
-            this.data = MemorySegment.NULL;
-        } else {
+        } else if (initialCapacity != 0) {
             throw new IllegalArgumentException("Illegal capacity: " + initialCapacity);
         }
-        this.elementLayout = elementLayout;
-        this.allocator = allocator;
-        this.capacity = initialCapacity;
     }
 
-    public ArrayBuffer(MemoryLayout elementLayout, Allocator allocator) {
-        this(elementLayout, allocator, 8);
+    public NativeList(MemoryLayout elementLayout, AllocatorFactory allocatorFactory) {
+        this(elementLayout, allocatorFactory, 8);
+    }
+
+    public NativeList(AllocatorFactory allocatorFactory, NativeList list) {
+        this.elementLayout = list.elementLayout;
+        this.capacity = list.capacity;
+        this.size = list.size;
+        this.data = MemorySegment.NULL;
+        this.allocator = allocatorFactory.create();
+        this.data = allocator.allocateFrom(list.data, elementLayout.byteAlignment());
+    }
+
+    public static NativeList move(AllocatorFactory allocatorFactory, NativeList list) {
+        NativeList nativeList = new NativeList(allocatorFactory, list);
+        list.free();
+        return nativeList;
     }
 
     @Override
@@ -134,7 +193,7 @@ public class ArrayBuffer implements ArrayBufferView, AutoCloseable {
     }
 
     private void reallocate(long newCapacity) {
-        data = allocator.reallocate(data, elementLayout.scale(0, newCapacity));
+        data = allocator.reallocate(data, elementLayout.scale(0, newCapacity), elementLayout.byteAlignment());
         capacity = newCapacity;
     }
 
@@ -210,6 +269,7 @@ public class ArrayBuffer implements ArrayBufferView, AutoCloseable {
 
     public void free() {
         allocator.free(data);
+        data = MemorySegment.NULL;
     }
 
     @Override

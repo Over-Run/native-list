@@ -24,23 +24,23 @@ enum Type {
 }
 
 void main() throws IOException {
-    Path packageDir = Path.of("io/github/overrun/arraybuffer");
+    Path packageDir = Path.of("io/github/overrun/nativelist");
     Files.createDirectories(packageDir);
 
     for (Type type : Type.values()) {
         StringBuilder sb = new StringBuilder();
         sb.append("// This file is auto-generated. DO NOT EDIT!\n");
-        sb.append("package io.github.overrun.arraybuffer;\n");
+        sb.append("package io.github.overrun.nativelist;\n");
         sb.append("import java.lang.foreign.*;\n");
         sb.append("import java.util.*;\n");
-        sb.append("public class ").append(type.prefix).append("ArrayBuffer extends ArrayBuffer {\n");
+        sb.append("public class ").append(type.prefix).append("NativeList extends NativeList {\n");
 
-        sb.append("    public ").append(type.prefix).append("ArrayBuffer(Allocator allocator, long initialCapacity) {\n");
+        sb.append("    public ").append(type.prefix).append("NativeList(Allocator allocator, long initialCapacity) {\n");
         sb.append("        super(").append(type.valueLayout).append(", allocator, initialCapacity);\n");
         sb.append("    }\n");
         sb.append('\n');
 
-        sb.append("    public ").append(type.prefix).append("ArrayBuffer(Allocator allocator) {\n");
+        sb.append("    public ").append(type.prefix).append("NativeList(Allocator allocator) {\n");
         sb.append("        super(").append(type.valueLayout).append(", allocator);\n");
         sb.append("    }\n");
         sb.append('\n');
@@ -102,6 +102,6 @@ void main() throws IOException {
 
         sb.append("}\n");
 
-        Files.writeString(packageDir.resolve(type.prefix + "ArrayBuffer.java"), sb);
+        Files.writeString(packageDir.resolve(type.prefix + "NativeList.java"), sb);
     }
 }

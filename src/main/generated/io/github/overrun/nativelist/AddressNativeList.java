@@ -1,13 +1,13 @@
 // This file is auto-generated. DO NOT EDIT!
-package io.github.overrun.arraybuffer;
+package io.github.overrun.nativelist;
 import java.lang.foreign.*;
 import java.util.*;
-public class AddressArrayBuffer extends ArrayBuffer {
-    public AddressArrayBuffer(Allocator allocator, long initialCapacity) {
+public class AddressNativeList extends NativeList {
+    public AddressNativeList(Allocator allocator, long initialCapacity) {
         super(ValueLayout.ADDRESS, allocator, initialCapacity);
     }
 
-    public AddressArrayBuffer(Allocator allocator) {
+    public AddressNativeList(Allocator allocator) {
         super(ValueLayout.ADDRESS, allocator);
     }
 

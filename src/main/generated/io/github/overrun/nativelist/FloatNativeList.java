@@ -1,13 +1,13 @@
 // This file is auto-generated. DO NOT EDIT!
-package io.github.overrun.arraybuffer;
+package io.github.overrun.nativelist;
 import java.lang.foreign.*;
 import java.util.*;
-public class FloatArrayBuffer extends ArrayBuffer {
-    public FloatArrayBuffer(Allocator allocator, long initialCapacity) {
+public class FloatNativeList extends NativeList {
+    public FloatNativeList(Allocator allocator, long initialCapacity) {
         super(ValueLayout.JAVA_FLOAT, allocator, initialCapacity);
     }
 
-    public FloatArrayBuffer(Allocator allocator) {
+    public FloatNativeList(Allocator allocator) {
         super(ValueLayout.JAVA_FLOAT, allocator);
     }
 
