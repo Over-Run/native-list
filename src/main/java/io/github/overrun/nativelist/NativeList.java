@@ -8,14 +8,19 @@ import java.util.function.Consumer;
 
 /// A resizable array backed by a [MemorySegment].
 ///
+/// The user is responsible for closing the native list.
+///
 /// @since 1.0.0
 public class NativeList implements NativeListView, AutoCloseable {
     private final MemoryLayout elementLayout;
     private final Allocator allocator;
+    /// The data.
     protected MemorySegment data;
     private long capacity;
+    /// The element count.
     protected long size = 0;
 
+    /// Provides methods for [NativeList] to allocate memory.
     public interface Allocator {
         /// Allocates a block of memory with the given size and alignment constraint.
         ///
@@ -58,28 +63,47 @@ public class NativeList implements NativeListView, AutoCloseable {
         /// @param segment the memory segment to be released, which **may** be [MemorySegment#NULL]
         void free(MemorySegment segment);
 
+        /// Creates an allocator with the [confined arena][java.lang.foreign.Arena#ofConfined()].
+        ///
+        /// @return the allocator
         static Allocator ofConfinedArena() {
             return ArenaAllocator.ofConfined();
         }
 
+        /// Creates an allocator with the [shared arena][java.lang.foreign.Arena#ofShared()].
+        ///
+        /// @return the allocator
         static Allocator ofSharedArena() {
             return ArenaAllocator.ofShared();
         }
 
+        /// Creates an allocator with the [auto arena][java.lang.foreign.Arena#ofAuto()].
+        ///
+        /// @return the allocator
         static Allocator ofAutoArena() {
             return ArenaAllocator.ofAuto();
         }
 
+        /// Creates an allocator with C `malloc` and `free`.
+        ///
+        /// @return the allocator
         static Allocator c() {
             return CAllocator.of();
         }
     }
 
+    /// Represents a factory of the [allocator][Allocator].
     @FunctionalInterface
     public interface AllocatorFactory {
+        /// {@return a newly created allocator}
         Allocator create();
     }
 
+    /// Constructor of [NativeList].
+    ///
+    /// @param elementLayout    the memory layout of the element
+    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param initialCapacity  the initial capacity of the native list; defaults to 8
     public NativeList(MemoryLayout elementLayout, AllocatorFactory allocatorFactory, long initialCapacity) {
         this.elementLayout = elementLayout;
         this.capacity = initialCapacity;
@@ -92,10 +116,23 @@ public class NativeList implements NativeListView, AutoCloseable {
         }
     }
 
+    /// Constructor of [NativeList].
+    ///
+    /// It is recommended to construct a native list with an initial capacity.
+    ///
+    /// @param elementLayout    the memory layout of the element
+    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @see NativeList#NativeList(MemoryLayout, AllocatorFactory, long)
     public NativeList(MemoryLayout elementLayout, AllocatorFactory allocatorFactory) {
         this(elementLayout, allocatorFactory, 8);
     }
 
+    /// Constructor of [NativeList].
+    ///
+    /// This copies element layout and data from `list`.
+    ///
+    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param list             the source native list
     public NativeList(AllocatorFactory allocatorFactory, NativeList list) {
         this.elementLayout = list.elementLayout;
         this.capacity = list.capacity;
@@ -105,6 +142,12 @@ public class NativeList implements NativeListView, AutoCloseable {
         this.data = allocator.allocateFrom(list.data, elementLayout.byteAlignment());
     }
 
+    /// Creates a new native list with the given allocator factory,
+    /// copies data from `list` and frees up `list`.
+    ///
+    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param list             the source native list
+    /// @return a native list
     public static NativeList move(AllocatorFactory allocatorFactory, NativeList list) {
         NativeList nativeList = new NativeList(allocatorFactory, list);
         list.free();
@@ -212,7 +255,7 @@ public class NativeList implements NativeListView, AutoCloseable {
             elementLayout.scale(0, size - fromIndex));
     }
 
-    public void reverse(long newCapacity) {
+    public void reserve(long newCapacity) {
         if (newCapacity > capacity) {
             reallocate(newCapacity);
         }

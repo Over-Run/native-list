@@ -3,12 +3,16 @@ package io.github.overrun.nativelist;
 import java.lang.foreign.*;
 import java.util.*;
 public class AddressNativeList extends NativeList {
-    public AddressNativeList(Allocator allocator, long initialCapacity) {
-        super(ValueLayout.ADDRESS, allocator, initialCapacity);
+    public AddressNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+        super(ValueLayout.ADDRESS, allocatorFactory, initialCapacity);
     }
 
-    public AddressNativeList(Allocator allocator) {
-        super(ValueLayout.ADDRESS, allocator);
+    public AddressNativeList(AllocatorFactory allocatorFactory) {
+        super(ValueLayout.ADDRESS, allocatorFactory);
+    }
+
+    public AddressNativeList(AllocatorFactory allocatorFactory, AddressNativeList list) {
+        super(allocatorFactory, list);
     }
 
     public MemorySegment get(long index) {

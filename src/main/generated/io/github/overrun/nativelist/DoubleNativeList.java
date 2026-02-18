@@ -3,12 +3,16 @@ package io.github.overrun.nativelist;
 import java.lang.foreign.*;
 import java.util.*;
 public class DoubleNativeList extends NativeList {
-    public DoubleNativeList(Allocator allocator, long initialCapacity) {
-        super(ValueLayout.JAVA_DOUBLE, allocator, initialCapacity);
+    public DoubleNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+        super(ValueLayout.JAVA_DOUBLE, allocatorFactory, initialCapacity);
     }
 
-    public DoubleNativeList(Allocator allocator) {
-        super(ValueLayout.JAVA_DOUBLE, allocator);
+    public DoubleNativeList(AllocatorFactory allocatorFactory) {
+        super(ValueLayout.JAVA_DOUBLE, allocatorFactory);
+    }
+
+    public DoubleNativeList(AllocatorFactory allocatorFactory, DoubleNativeList list) {
+        super(allocatorFactory, list);
     }
 
     public double get(long index) {

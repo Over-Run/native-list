@@ -3,12 +3,16 @@ package io.github.overrun.nativelist;
 import java.lang.foreign.*;
 import java.util.*;
 public class IntNativeList extends NativeList {
-    public IntNativeList(Allocator allocator, long initialCapacity) {
-        super(ValueLayout.JAVA_INT, allocator, initialCapacity);
+    public IntNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+        super(ValueLayout.JAVA_INT, allocatorFactory, initialCapacity);
     }
 
-    public IntNativeList(Allocator allocator) {
-        super(ValueLayout.JAVA_INT, allocator);
+    public IntNativeList(AllocatorFactory allocatorFactory) {
+        super(ValueLayout.JAVA_INT, allocatorFactory);
+    }
+
+    public IntNativeList(AllocatorFactory allocatorFactory, IntNativeList list) {
+        super(allocatorFactory, list);
     }
 
     public int get(long index) {

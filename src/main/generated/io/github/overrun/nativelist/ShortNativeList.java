@@ -3,12 +3,16 @@ package io.github.overrun.nativelist;
 import java.lang.foreign.*;
 import java.util.*;
 public class ShortNativeList extends NativeList {
-    public ShortNativeList(Allocator allocator, long initialCapacity) {
-        super(ValueLayout.JAVA_SHORT, allocator, initialCapacity);
+    public ShortNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+        super(ValueLayout.JAVA_SHORT, allocatorFactory, initialCapacity);
     }
 
-    public ShortNativeList(Allocator allocator) {
-        super(ValueLayout.JAVA_SHORT, allocator);
+    public ShortNativeList(AllocatorFactory allocatorFactory) {
+        super(ValueLayout.JAVA_SHORT, allocatorFactory);
+    }
+
+    public ShortNativeList(AllocatorFactory allocatorFactory, ShortNativeList list) {
+        super(allocatorFactory, list);
     }
 
     public short get(long index) {

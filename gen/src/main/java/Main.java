@@ -35,13 +35,18 @@ void main() throws IOException {
         sb.append("import java.util.*;\n");
         sb.append("public class ").append(type.prefix).append("NativeList extends NativeList {\n");
 
-        sb.append("    public ").append(type.prefix).append("NativeList(Allocator allocator, long initialCapacity) {\n");
-        sb.append("        super(").append(type.valueLayout).append(", allocator, initialCapacity);\n");
+        sb.append("    public ").append(type.prefix).append("NativeList(AllocatorFactory allocatorFactory, long initialCapacity) {\n");
+        sb.append("        super(").append(type.valueLayout).append(", allocatorFactory, initialCapacity);\n");
         sb.append("    }\n");
         sb.append('\n');
 
-        sb.append("    public ").append(type.prefix).append("NativeList(Allocator allocator) {\n");
-        sb.append("        super(").append(type.valueLayout).append(", allocator);\n");
+        sb.append("    public ").append(type.prefix).append("NativeList(AllocatorFactory allocatorFactory) {\n");
+        sb.append("        super(").append(type.valueLayout).append(", allocatorFactory);\n");
+        sb.append("    }\n");
+        sb.append('\n');
+
+        sb.append("    public ").append(type.prefix).append("NativeList(AllocatorFactory allocatorFactory, ").append(type.prefix).append("NativeList list) {\n");
+        sb.append("        super(allocatorFactory, list);\n");
         sb.append("    }\n");
         sb.append('\n');
 

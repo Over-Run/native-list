@@ -3,12 +3,16 @@ package io.github.overrun.nativelist;
 import java.lang.foreign.*;
 import java.util.*;
 public class ByteNativeList extends NativeList {
-    public ByteNativeList(Allocator allocator, long initialCapacity) {
-        super(ValueLayout.JAVA_BYTE, allocator, initialCapacity);
+    public ByteNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+        super(ValueLayout.JAVA_BYTE, allocatorFactory, initialCapacity);
     }
 
-    public ByteNativeList(Allocator allocator) {
-        super(ValueLayout.JAVA_BYTE, allocator);
+    public ByteNativeList(AllocatorFactory allocatorFactory) {
+        super(ValueLayout.JAVA_BYTE, allocatorFactory);
+    }
+
+    public ByteNativeList(AllocatorFactory allocatorFactory, ByteNativeList list) {
+        super(allocatorFactory, list);
     }
 
     public byte get(long index) {
