@@ -1,6 +1,7 @@
 plugins {
     `java-library`
     idea
+    `maven-publish`
 }
 
 group = "io.github.over-run"
@@ -20,6 +21,13 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
+}
+
+tasks.withType<Javadoc> {
+    options {
+        jFlags("-Duser.language=en")
+    }
 }
 
 sourceSets {
@@ -28,10 +36,16 @@ sourceSets {
             srcDirs("src/main/generated")
         }
     }
+
 }
 
 idea {
     module {
         generatedSourceDirs.add(file("src/main/generated"))
     }
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
 }

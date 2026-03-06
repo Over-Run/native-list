@@ -113,7 +113,7 @@ final class CAllocator implements NativeList.Allocator {
         }
         if (newSize < oldSize) {
             setAlignedPtrSize(aligned, newSize);
-            return segment;
+            return segment.reinterpret(newSize);
         }
 
         MemorySegment newAligned = alignedMalloc(newSize, alignment);

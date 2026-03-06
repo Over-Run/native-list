@@ -58,6 +58,9 @@ final class ArenaAllocator implements NativeList.Allocator {
 
     @Override
     public void free(MemorySegment segment) {
+        if (MemorySegment.NULL.equals(segment)) {
+            return;
+        }
         if (!Objects.equals(arena.scope(), segment.scope())) {
             throw new IllegalArgumentException("The specified memory segment " + segment + " was not allocated by this allocator");
         }

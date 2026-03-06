@@ -13,6 +13,7 @@ public interface NativeListView {
     /// {@return a read-only slice of the data containing the element at the given index}
     ///
     /// @param index the index of the element
+    /// @throws IndexOutOfBoundsException if the index is out of bounds
     MemorySegment getConstElementRef(long index);
 
     /// {@return a read-only view of this native list's data}
@@ -22,6 +23,7 @@ public interface NativeListView {
     ///
     /// @param index the index of the starting element
     /// @param size  the count of the elements
+    /// @throws IndexOutOfBoundsException if the sub-range is out of bounds
     MemorySegment asConstSlice(long index, long size);
 
     /// {@return the maximum count of the elements}

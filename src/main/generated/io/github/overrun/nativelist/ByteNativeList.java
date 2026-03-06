@@ -2,30 +2,48 @@
 package io.github.overrun.nativelist;
 import java.lang.foreign.*;
 import java.util.*;
-public class ByteNativeList extends NativeList {
+/// The `byte` specialized version of [NativeList].
+public class ByteNativeList extends NativeList implements ByteNativeListView {
+    /// Constructor of [ByteNativeList].
+    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param initialCapacity  the initial capacity of the native list; defaults to 8
+    /// @throws IllegalArgumentException if `initialCapacity < 0`
     public ByteNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
         super(ValueLayout.JAVA_BYTE, allocatorFactory, initialCapacity);
     }
-
+    /// Constructor of [ByteNativeList].
+    ///
+    /// It is recommended to construct a native list with an initial capacity.
+    /// @param allocatorFactory a factory of the [allocator][Allocator]
     public ByteNativeList(AllocatorFactory allocatorFactory) {
         super(ValueLayout.JAVA_BYTE, allocatorFactory);
     }
 
+    /// Constructor of [ByteNativeList].
+    ///
+    /// This copies element layout and data from `list`.
+    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param list             the source native list
     public ByteNativeList(AllocatorFactory allocatorFactory, ByteNativeList list) {
         super(allocatorFactory, list);
     }
 
-    public byte get(long index) {
+    @Override public byte get(long index) {
         Objects.checkIndex(index, size);
         return data.getAtIndex(ValueLayout.JAVA_BYTE, index);
     }
 
+    /// Inserts the given element at the end.
+    /// @param value the value
     public void add(byte value) {
         ensureCapacity(size + 1);
         data.setAtIndex(ValueLayout.JAVA_BYTE, size, value);
         size++;
     }
 
+    /// Inserts the given element at the given index.
+    /// @param index the index of the element to be inserted
+    /// @param value the value
     public void add(long index, byte value) {
         if (index == size) {
             add(value);
@@ -39,12 +57,18 @@ public class ByteNativeList extends NativeList {
         size++;
     }
 
+    /// Inserts the given elements at the end.
+    /// @param values the values
     public void addAll(byte[] values) {
+        if (values.length == 0) return;
         ensureCapacity(size + values.length);
         MemorySegment.copy(values, 0, data, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE.scale(0, size), values.length);
         size += values.length;
     }
 
+    /// Inserts the given elements at the given index.
+    /// @param index  the index of the elements to be inserted
+    /// @param values the values
     public void addAll(long index, byte[] values) {
         if (index == size) {
             addAll(values);
@@ -52,12 +76,14 @@ public class ByteNativeList extends NativeList {
         }
 
         Objects.checkIndex(index, size + values.length);
+        if (values.length == 0) return;
         ensureCapacity(size + values.length);
         move(index, index + values.length);
         MemorySegment.copy(values, 0, data, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE.scale(0, index), values.length);
         size += values.length;
     }
 
-    public byte[] toArray() { return data().toArray(ValueLayout.JAVA_BYTE); }
+    @Override public byte[] toArray() { return data().toArray(ValueLayout.JAVA_BYTE); }
+
     @Override public ValueLayout.OfByte elementLayout() { return ValueLayout.JAVA_BYTE; }
 }

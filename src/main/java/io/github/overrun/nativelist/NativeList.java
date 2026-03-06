@@ -29,6 +29,7 @@ public class NativeList implements NativeListView, AutoCloseable {
         ///
         /// @param byteSize      the size of the memory to be allocated in bytes
         /// @param byteAlignment the alignment constraint in bytes
+        /// @return a new native memory segment
         /// @throws IllegalArgumentException if `bytesSize < 0`, `byteAlignment <= 0`, or if `byteAlignment` is not a power of 2
         /// @throws OutOfMemoryError         if error occurs when allocating memory
         MemorySegment allocate(long byteSize, long byteAlignment);
@@ -40,6 +41,7 @@ public class NativeList implements NativeListView, AutoCloseable {
         ///
         /// @param segment       the memory segment to be copied
         /// @param byteAlignment the alignment constraint in bytes
+        /// @return a new native memory segment
         /// @throws IllegalArgumentException if `byteAlignment <= 0`, or if `byteAlignment` is not a power of 2
         /// @throws OutOfMemoryError         if error occurs when allocating memory
         MemorySegment allocateFrom(MemorySegment segment, long byteAlignment);
@@ -52,6 +54,7 @@ public class NativeList implements NativeListView, AutoCloseable {
         /// @param segment       the memory segment to be reallocated, which **may** be [MemorySegment#NULL]
         /// @param newByteSize   the new size in bytes, which **may** be smaller than the previous one
         /// @param byteAlignment the alignment constraint in bytes
+        /// @return a new native memory segment
         /// @throws IllegalArgumentException if `bytesSize < 0`, `byteAlignment <= 0`, or if `byteAlignment` is not a power of 2
         /// @throws OutOfMemoryError         if error occurs when reallocating memory
         MemorySegment reallocate(MemorySegment segment, long newByteSize, long byteAlignment);
@@ -104,15 +107,17 @@ public class NativeList implements NativeListView, AutoCloseable {
     /// @param elementLayout    the memory layout of the element
     /// @param allocatorFactory a factory of the [allocator][Allocator]
     /// @param initialCapacity  the initial capacity of the native list; defaults to 8
+    /// @throws IllegalArgumentException if `initialCapacity < 0`
     public NativeList(MemoryLayout elementLayout, AllocatorFactory allocatorFactory, long initialCapacity) {
         this.elementLayout = elementLayout;
         this.capacity = initialCapacity;
-        this.data = MemorySegment.NULL;
         this.allocator = allocatorFactory.create();
         if (initialCapacity > 0) {
             this.data = allocator.allocate(elementLayout.scale(0, initialCapacity), elementLayout.byteAlignment());
         } else if (initialCapacity != 0) {
             throw new IllegalArgumentException("Illegal capacity: " + initialCapacity);
+        } else {
+            this.data = MemorySegment.NULL;
         }
     }
 
@@ -122,6 +127,7 @@ public class NativeList implements NativeListView, AutoCloseable {
     ///
     /// @param elementLayout    the memory layout of the element
     /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @throws IllegalArgumentException if `initialCapacity < 0`
     /// @see NativeList#NativeList(MemoryLayout, AllocatorFactory, long)
     public NativeList(MemoryLayout elementLayout, AllocatorFactory allocatorFactory) {
         this(elementLayout, allocatorFactory, 8);
@@ -137,7 +143,6 @@ public class NativeList implements NativeListView, AutoCloseable {
         this.elementLayout = list.elementLayout;
         this.capacity = list.capacity;
         this.size = list.size;
-        this.data = MemorySegment.NULL;
         this.allocator = allocatorFactory.create();
         this.data = allocator.allocateFrom(list.data, elementLayout.byteAlignment());
     }
@@ -159,17 +164,28 @@ public class NativeList implements NativeListView, AutoCloseable {
         return getElementRef(index).asReadOnly();
     }
 
+    /// {@return a slice of the data containing the element at the given index}
+    ///
+    /// @param index the index of the element
+    /// @throws IndexOutOfBoundsException if the index is out of bounds
     public MemorySegment getElementRef(long index) {
         Objects.checkIndex(index, size);
         return data.asSlice(elementLayout.scale(0, index), elementLayout);
     }
 
+    /// Constructs an element in place and inserts it at the end.
+    ///
+    /// @param elementRefConsumer the consumer accepting a slice of the data
     public void add(Consumer<MemorySegment> elementRefConsumer) {
         ensureCapacity(size + 1);
         elementRefConsumer.accept(getElementRef(size));
         size++;
     }
 
+    /// Constructs an element in place and inserts it at the given index.
+    ///
+    /// @param index              the index of the element to be inserted
+    /// @param elementRefConsumer the consumer accepting a slice of the data
     public void add(long index, Consumer<MemorySegment> elementRefConsumer) {
         if (index == size) {
             add(elementRefConsumer);
@@ -183,12 +199,21 @@ public class NativeList implements NativeListView, AutoCloseable {
         size++;
     }
 
+    /// Constructs `count` elements in place and inserts them at the end.
+    ///
+    /// @param count              the count of element
+    /// @param elementRefConsumer the consumer accepting a slice of the data
     public void addAll(long count, Consumer<MemorySegment> elementRefConsumer) {
         ensureCapacity(size + count);
         elementRefConsumer.accept(asSlice(size, count));
         size += count;
     }
 
+    /// Constructs `count` elements in place and inserts them at the given index.
+    ///
+    /// @param index              the index of the elements to be inserted
+    /// @param count              the count of element
+    /// @param elementRefConsumer the consumer accepting a slice of the data
     public void addAll(long index, long count, Consumer<MemorySegment> elementRefConsumer) {
         if (index == size) {
             addAll(count, elementRefConsumer);
@@ -202,6 +227,9 @@ public class NativeList implements NativeListView, AutoCloseable {
         size += count;
     }
 
+    /// Removes the specified element at the given index.
+    ///
+    /// @param index the index of the elements to be removed
     public void remove(long index) {
         if (index == 0) {
             removeFirst();
@@ -217,6 +245,7 @@ public class NativeList implements NativeListView, AutoCloseable {
         size--;
     }
 
+    /// Removes the first element.
     public void removeFirst() {
         if (size <= 0) {
             throw new NoSuchElementException();
@@ -227,6 +256,7 @@ public class NativeList implements NativeListView, AutoCloseable {
         size--;
     }
 
+    /// Removes the last element.
     public void removeLast() {
         long last = size - 1;
         if (last < 0) {
@@ -240,6 +270,9 @@ public class NativeList implements NativeListView, AutoCloseable {
         capacity = newCapacity;
     }
 
+    /// Ensures the capacity. Grows 2x if the current capacity is less than the required one.
+    ///
+    /// @param required the required capacity
     protected void ensureCapacity(long required) {
         if (required > capacity) {
             long newCapacity = Math.max(capacity * 2, required);
@@ -247,6 +280,10 @@ public class NativeList implements NativeListView, AutoCloseable {
         }
     }
 
+    /// Moves the data, ranging from `fromIndex` to the end, to `toIndex`.
+    ///
+    /// @param fromIndex the index of the first element to be moved
+    /// @param toIndex   the new index of the elements to be moved to
     protected void move(long fromIndex, long toIndex) {
         MemorySegment.copy(data,
             elementLayout.scale(0, fromIndex),
@@ -255,12 +292,18 @@ public class NativeList implements NativeListView, AutoCloseable {
             elementLayout.scale(0, size - fromIndex));
     }
 
+    /// Reserves a specified capacity of elements.
+    ///
+    /// @param newCapacity the new capacity to reserve
     public void reserve(long newCapacity) {
         if (newCapacity > capacity) {
             reallocate(newCapacity);
         }
     }
 
+    /// Trims the data to the size of this list.
+    ///
+    /// This may lead to significant memory overhead when employing an arena allocator.
     public void trimToSize() {
         if (size < capacity) {
             reallocate(size);
@@ -277,6 +320,7 @@ public class NativeList implements NativeListView, AutoCloseable {
         return data().asReadOnly();
     }
 
+    /// {@return the data of this native list}
     public MemorySegment data() {
         return data.asSlice(0, elementLayout.scale(0, size));
     }
@@ -286,6 +330,11 @@ public class NativeList implements NativeListView, AutoCloseable {
         return asSlice(index, size).asReadOnly();
     }
 
+    /// {@return a slice of the data with the given size}
+    ///
+    /// @param index the index of the starting element
+    /// @param size  the count of the elements
+    /// @throws IndexOutOfBoundsException if the sub-range is out of bounds
     public MemorySegment asSlice(long index, long size) {
         Objects.checkFromIndexSize(index, size, this.size);
         return data.asSlice(elementLayout.scale(0, index), elementLayout.scale(0, size));
@@ -306,10 +355,12 @@ public class NativeList implements NativeListView, AutoCloseable {
         return size == 0;
     }
 
+    /// Clears this list.
     public void clear() {
         size = 0;
     }
 
+    /// Releases this list with [`Allocator::free`][Allocator#free(MemorySegment)].
     public void free() {
         allocator.free(data);
         data = MemorySegment.NULL;

@@ -1,3 +1,5 @@
+/// The main module of NativeList.
+///
 /// @since 1.0.0
 module io.github.overrun.nativelist {
     exports io.github.overrun.nativelist;

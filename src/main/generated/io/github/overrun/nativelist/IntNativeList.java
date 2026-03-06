@@ -2,30 +2,48 @@
 package io.github.overrun.nativelist;
 import java.lang.foreign.*;
 import java.util.*;
-public class IntNativeList extends NativeList {
+/// The `int` specialized version of [NativeList].
+public class IntNativeList extends NativeList implements IntNativeListView {
+    /// Constructor of [IntNativeList].
+    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param initialCapacity  the initial capacity of the native list; defaults to 8
+    /// @throws IllegalArgumentException if `initialCapacity < 0`
     public IntNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
         super(ValueLayout.JAVA_INT, allocatorFactory, initialCapacity);
     }
-
+    /// Constructor of [IntNativeList].
+    ///
+    /// It is recommended to construct a native list with an initial capacity.
+    /// @param allocatorFactory a factory of the [allocator][Allocator]
     public IntNativeList(AllocatorFactory allocatorFactory) {
         super(ValueLayout.JAVA_INT, allocatorFactory);
     }
 
+    /// Constructor of [IntNativeList].
+    ///
+    /// This copies element layout and data from `list`.
+    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param list             the source native list
     public IntNativeList(AllocatorFactory allocatorFactory, IntNativeList list) {
         super(allocatorFactory, list);
     }
 
-    public int get(long index) {
+    @Override public int get(long index) {
         Objects.checkIndex(index, size);
         return data.getAtIndex(ValueLayout.JAVA_INT, index);
     }
 
+    /// Inserts the given element at the end.
+    /// @param value the value
     public void add(int value) {
         ensureCapacity(size + 1);
         data.setAtIndex(ValueLayout.JAVA_INT, size, value);
         size++;
     }
 
+    /// Inserts the given element at the given index.
+    /// @param index the index of the element to be inserted
+    /// @param value the value
     public void add(long index, int value) {
         if (index == size) {
             add(value);
@@ -39,12 +57,18 @@ public class IntNativeList extends NativeList {
         size++;
     }
 
+    /// Inserts the given elements at the end.
+    /// @param values the values
     public void addAll(int[] values) {
+        if (values.length == 0) return;
         ensureCapacity(size + values.length);
         MemorySegment.copy(values, 0, data, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT.scale(0, size), values.length);
         size += values.length;
     }
 
+    /// Inserts the given elements at the given index.
+    /// @param index  the index of the elements to be inserted
+    /// @param values the values
     public void addAll(long index, int[] values) {
         if (index == size) {
             addAll(values);
@@ -52,12 +76,14 @@ public class IntNativeList extends NativeList {
         }
 
         Objects.checkIndex(index, size + values.length);
+        if (values.length == 0) return;
         ensureCapacity(size + values.length);
         move(index, index + values.length);
         MemorySegment.copy(values, 0, data, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT.scale(0, index), values.length);
         size += values.length;
     }
 
-    public int[] toArray() { return data().toArray(ValueLayout.JAVA_INT); }
+    @Override public int[] toArray() { return data().toArray(ValueLayout.JAVA_INT); }
+
     @Override public ValueLayout.OfInt elementLayout() { return ValueLayout.JAVA_INT; }
 }
