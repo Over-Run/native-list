@@ -9,7 +9,7 @@ public interface FloatNativeListView extends NativeListView {
     float get(long index);
 
     /// {@return a new array containing the data in Java form}
-    default float[] toArray() { return constData().toArray(ValueLayout.JAVA_FLOAT); }
+    float[] toArray();
 
-    @Override default ValueLayout.OfFloat elementLayout() { return ValueLayout.JAVA_FLOAT; }
+    @Override ValueLayout.OfFloat elementLayout();
 }

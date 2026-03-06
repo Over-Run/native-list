@@ -8,5 +8,5 @@ public interface AddressNativeListView extends NativeListView {
     /// @param index the index of the element
     MemorySegment get(long index);
 
-    @Override default AddressLayout elementLayout() { return ValueLayout.ADDRESS; }
+    @Override AddressLayout elementLayout();
 }

@@ -9,7 +9,7 @@ public interface ByteNativeListView extends NativeListView {
     byte get(long index);
 
     /// {@return a new array containing the data in Java form}
-    default byte[] toArray() { return constData().toArray(ValueLayout.JAVA_BYTE); }
+    byte[] toArray();
 
-    @Override default ValueLayout.OfByte elementLayout() { return ValueLayout.JAVA_BYTE; }
+    @Override ValueLayout.OfByte elementLayout();
 }

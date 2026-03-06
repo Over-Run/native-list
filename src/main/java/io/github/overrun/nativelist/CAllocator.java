@@ -7,6 +7,8 @@ import java.lang.invoke.MethodHandle;
 final class CAllocator implements NativeList.Allocator {
     private static final long ADDRESS_SIZE = ValueLayout.ADDRESS.byteSize();
     private static final long MAX_MALLOC_ALIGN = 2 * ADDRESS_SIZE;
+    private static final long OFFSET_alignedPtrRaw = -MAX_MALLOC_ALIGN;
+    private static final long OFFSET_alignedPtrSize = -MAX_MALLOC_ALIGN + ADDRESS_SIZE;
     private static final Linker LINKER = Linker.nativeLinker();
     private static final SymbolLookup SYMBOL_LOOKUP = LINKER.defaultLookup();
     private static final MemoryLayout SIZE_T = LINKER.canonicalLayouts().get("size_t");
@@ -48,19 +50,19 @@ final class CAllocator implements NativeList.Allocator {
     }
 
     private static void setAlignedPtrRaw(long aligned, MemorySegment raw) {
-        MemorySegment.ofAddress(aligned - 2 * ADDRESS_SIZE)
+        MemorySegment.ofAddress(aligned + OFFSET_alignedPtrRaw)
             .reinterpret(ADDRESS_SIZE)
             .set(ValueLayout.ADDRESS, 0, raw);
     }
 
     private static MemorySegment getAlignedPtrRaw(long aligned) {
-        return MemorySegment.ofAddress(aligned - 2 * ADDRESS_SIZE)
+        return MemorySegment.ofAddress(aligned + OFFSET_alignedPtrRaw)
             .reinterpret(ADDRESS_SIZE)
             .get(ValueLayout.ADDRESS, 0);
     }
 
     private static void setAlignedPtrSize(long aligned, long size) {
-        MemorySegment sizePtr = MemorySegment.ofAddress(aligned - ADDRESS_SIZE)
+        MemorySegment sizePtr = MemorySegment.ofAddress(aligned + OFFSET_alignedPtrSize)
             .reinterpret(ADDRESS_SIZE);
         switch (SIZE_T) {
             case ValueLayout.OfInt layout -> sizePtr.set(layout, 0, Math.toIntExact(size));
@@ -70,7 +72,7 @@ final class CAllocator implements NativeList.Allocator {
     }
 
     private static long getAlignedPtrSize(long aligned) {
-        MemorySegment sizePtr = MemorySegment.ofAddress(aligned - ADDRESS_SIZE)
+        MemorySegment sizePtr = MemorySegment.ofAddress(aligned + OFFSET_alignedPtrSize)
             .reinterpret(ADDRESS_SIZE);
         return switch (SIZE_T) {
             case ValueLayout.OfInt layout -> sizePtr.get(layout, 0);
@@ -80,14 +82,14 @@ final class CAllocator implements NativeList.Allocator {
     }
 
     private static MemorySegment alignedMalloc(long size, long alignment) {
-        long totalSize = size + alignment + 2 * MAX_MALLOC_ALIGN;
+        long totalSize = size + alignment + MAX_MALLOC_ALIGN;
         MemorySegment raw = malloc(totalSize);
         if (MemorySegment.NULL.equals(raw)) {
             throw new OutOfMemoryError();
         }
 
         long rawAddress = raw.address();
-        long start = rawAddress + 2 * MAX_MALLOC_ALIGN;
+        long start = rawAddress + MAX_MALLOC_ALIGN;
         long aligned = (start + alignment - 1) & -alignment;
         MemorySegment alignedPtr = MemorySegment.ofAddress(aligned).reinterpret(size);
 
@@ -134,13 +136,6 @@ final class CAllocator implements NativeList.Allocator {
     public MemorySegment allocate(long byteSize, long byteAlignment) {
         Util.checkSizeAndAlignment(byteSize, byteAlignment);
         return alignedMalloc(byteSize, byteAlignment);
-    }
-
-    @Override
-    public MemorySegment allocateFrom(MemorySegment segment, long byteAlignment) {
-        MemorySegment newSegment = allocate(segment.byteSize(), byteAlignment);
-        MemorySegment.copy(segment, 0, newSegment, 0, segment.byteSize());
-        return newSegment;
     }
 
     @Override

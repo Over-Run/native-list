@@ -9,7 +9,7 @@ public interface CharNativeListView extends NativeListView {
     char get(long index);
 
     /// {@return a new array containing the data in Java form}
-    default char[] toArray() { return constData().toArray(ValueLayout.JAVA_CHAR); }
+    char[] toArray();
 
-    @Override default ValueLayout.OfChar elementLayout() { return ValueLayout.JAVA_CHAR; }
+    @Override ValueLayout.OfChar elementLayout();
 }

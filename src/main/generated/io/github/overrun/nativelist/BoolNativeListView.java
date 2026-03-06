@@ -8,5 +8,5 @@ public interface BoolNativeListView extends NativeListView {
     /// @param index the index of the element
     boolean get(long index);
 
-    @Override default ValueLayout.OfBoolean elementLayout() { return ValueLayout.JAVA_BOOLEAN; }
+    @Override ValueLayout.OfBoolean elementLayout();
 }

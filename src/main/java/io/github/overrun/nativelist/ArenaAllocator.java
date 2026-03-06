@@ -32,14 +32,6 @@ final class ArenaAllocator implements NativeList.Allocator {
     }
 
     @Override
-    public MemorySegment allocateFrom(MemorySegment segment, long byteAlignment) {
-        long byteSize = segment.byteSize();
-        MemorySegment newSegment = allocate(byteSize, byteAlignment);
-        MemorySegment.copy(segment, 0, newSegment, 0, byteSize);
-        return newSegment;
-    }
-
-    @Override
     public MemorySegment reallocate(MemorySegment segment, long newByteSize, long byteAlignment) {
         if (MemorySegment.NULL.equals(segment)) {
             return allocate(newByteSize, byteAlignment);

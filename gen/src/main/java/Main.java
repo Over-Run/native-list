@@ -58,11 +58,11 @@ void generateViewClass(Path packageDir, Type type) throws IOException {
 
     if (type.hasArray) {
         sb.appendLine("    /// {@return a new array containing the data in Java form}");
-        sb.append("    default ").append(type.typeName).append("[] toArray() { return constData().toArray(").append(type.valueLayout).appendLine("); }");
+        sb.append("    ").append(type.typeName).appendLine("[] toArray();");
         sb.appendLine();
     }
 
-    sb.append("    @Override default ").append(type.valueLayoutClass).append(" elementLayout() { return ").append(type.valueLayout).appendLine("; }");
+    sb.append("    @Override ").append(type.valueLayoutClass).appendLine(" elementLayout();");
 
     sb.appendLine("}");
 

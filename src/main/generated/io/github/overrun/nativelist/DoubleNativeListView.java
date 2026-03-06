@@ -9,7 +9,7 @@ public interface DoubleNativeListView extends NativeListView {
     double get(long index);
 
     /// {@return a new array containing the data in Java form}
-    default double[] toArray() { return constData().toArray(ValueLayout.JAVA_DOUBLE); }
+    double[] toArray();
 
-    @Override default ValueLayout.OfDouble elementLayout() { return ValueLayout.JAVA_DOUBLE; }
+    @Override ValueLayout.OfDouble elementLayout();
 }

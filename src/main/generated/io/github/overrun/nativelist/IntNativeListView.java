@@ -9,7 +9,7 @@ public interface IntNativeListView extends NativeListView {
     int get(long index);
 
     /// {@return a new array containing the data in Java form}
-    default int[] toArray() { return constData().toArray(ValueLayout.JAVA_INT); }
+    int[] toArray();
 
-    @Override default ValueLayout.OfInt elementLayout() { return ValueLayout.JAVA_INT; }
+    @Override ValueLayout.OfInt elementLayout();
 }

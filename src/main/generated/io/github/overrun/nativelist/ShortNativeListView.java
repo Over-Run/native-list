@@ -9,7 +9,7 @@ public interface ShortNativeListView extends NativeListView {
     short get(long index);
 
     /// {@return a new array containing the data in Java form}
-    default short[] toArray() { return constData().toArray(ValueLayout.JAVA_SHORT); }
+    short[] toArray();
 
-    @Override default ValueLayout.OfShort elementLayout() { return ValueLayout.JAVA_SHORT; }
+    @Override ValueLayout.OfShort elementLayout();
 }

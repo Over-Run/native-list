@@ -44,7 +44,11 @@ public class NativeList implements NativeListView, AutoCloseable {
         /// @return a new native memory segment
         /// @throws IllegalArgumentException if `byteAlignment <= 0`, or if `byteAlignment` is not a power of 2
         /// @throws OutOfMemoryError         if error occurs when allocating memory
-        MemorySegment allocateFrom(MemorySegment segment, long byteAlignment);
+        default MemorySegment allocateFrom(MemorySegment segment, long byteAlignment) {
+            MemorySegment newSegment = allocate(segment.byteSize(), byteAlignment);
+            MemorySegment.copy(segment, 0, newSegment, 0, segment.byteSize());
+            return newSegment;
+        }
 
         /// Reallocates the memory segment with a new size.
         ///
@@ -170,6 +174,10 @@ public class NativeList implements NativeListView, AutoCloseable {
     /// @throws IndexOutOfBoundsException if the index is out of bounds
     public MemorySegment getElementRef(long index) {
         Objects.checkIndex(index, size);
+        return getElementRefNoCheck(index);
+    }
+
+    private MemorySegment getElementRefNoCheck(long index) {
         return data.asSlice(elementLayout.scale(0, index), elementLayout);
     }
 
@@ -178,7 +186,7 @@ public class NativeList implements NativeListView, AutoCloseable {
     /// @param elementRefConsumer the consumer accepting a slice of the data
     public void add(Consumer<MemorySegment> elementRefConsumer) {
         ensureCapacity(size + 1);
-        elementRefConsumer.accept(getElementRef(size));
+        elementRefConsumer.accept(getElementRefNoCheck(size));
         size++;
     }
 
@@ -195,7 +203,7 @@ public class NativeList implements NativeListView, AutoCloseable {
         Objects.checkIndex(index, size + 1);
         ensureCapacity(size + 1);
         move(index, index + 1);
-        elementRefConsumer.accept(getElementRef(index));
+        elementRefConsumer.accept(getElementRefNoCheck(index));
         size++;
     }
 
@@ -205,7 +213,7 @@ public class NativeList implements NativeListView, AutoCloseable {
     /// @param elementRefConsumer the consumer accepting a slice of the data
     public void addAll(long count, Consumer<MemorySegment> elementRefConsumer) {
         ensureCapacity(size + count);
-        elementRefConsumer.accept(asSlice(size, count));
+        elementRefConsumer.accept(asSliceNoCheck(size, count));
         size += count;
     }
 
@@ -223,7 +231,7 @@ public class NativeList implements NativeListView, AutoCloseable {
         Objects.checkIndex(index, size + count);
         ensureCapacity(size + count);
         move(index, index + count);
-        elementRefConsumer.accept(asSlice(index, count));
+        elementRefConsumer.accept(asSliceNoCheck(index, count));
         size += count;
     }
 
@@ -337,6 +345,10 @@ public class NativeList implements NativeListView, AutoCloseable {
     /// @throws IndexOutOfBoundsException if the sub-range is out of bounds
     public MemorySegment asSlice(long index, long size) {
         Objects.checkFromIndexSize(index, size, this.size);
+        return asSliceNoCheck(index, size);
+    }
+
+    private MemorySegment asSliceNoCheck(long index, long size) {
         return data.asSlice(elementLayout.scale(0, index), elementLayout.scale(0, size));
     }
 

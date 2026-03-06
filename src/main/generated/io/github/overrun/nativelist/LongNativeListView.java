@@ -9,7 +9,7 @@ public interface LongNativeListView extends NativeListView {
     long get(long index);
 
     /// {@return a new array containing the data in Java form}
-    default long[] toArray() { return constData().toArray(ValueLayout.JAVA_LONG); }
+    long[] toArray();
 
-    @Override default ValueLayout.OfLong elementLayout() { return ValueLayout.JAVA_LONG; }
+    @Override ValueLayout.OfLong elementLayout();
 }
