@@ -46,6 +46,25 @@ idea {
 }
 
 java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+
     withSourcesJar()
     withJavadocJar()
+}
+
+tasks.withType<JavaCompile> {
+    options.release = 25
+}
+
+publishing.publications {
+    register<MavenPublication>("mavenPublication") {
+        groupId = project.group.toString()
+        artifactId = "native-list"
+        version = project.version.toString()
+        from(components["java"])
+        pom {
+        }
+    }
 }

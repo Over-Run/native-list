@@ -44,6 +44,7 @@ public class LongNativeList extends NativeList implements LongNativeListView {
     /// Inserts the given element at the given index.
     /// @param index the index of the element to be inserted
     /// @param value the value
+    /// @throws IndexOutOfBoundsException if the index is out of bounds
     public void add(long index, long value) {
         if (index == size) {
             add(value);
@@ -69,6 +70,7 @@ public class LongNativeList extends NativeList implements LongNativeListView {
     /// Inserts the given elements at the given index.
     /// @param index  the index of the elements to be inserted
     /// @param values the values
+    /// @throws IndexOutOfBoundsException if the index is out of bounds
     public void addAll(long index, long[] values) {
         if (index == size) {
             addAll(values);

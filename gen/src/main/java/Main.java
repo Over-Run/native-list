@@ -53,6 +53,7 @@ void generateViewClass(Path packageDir, Type type) throws IOException {
 
     sb.appendLine("    /// {@return the element at the given index}");
     sb.appendLine("    /// @param index the index of the element");
+    sb.appendLine("    /// @throws IndexOutOfBoundsException if the index is out of bounds");
     sb.append("    ").append(type.typeName).appendLine(" get(long index);");
     sb.appendLine();
 
@@ -124,6 +125,7 @@ void generateClass(Path packageDir, Type type) throws IOException {
     sb.appendLine("    /// Inserts the given element at the given index.");
     sb.appendLine("    /// @param index the index of the element to be inserted");
     sb.appendLine("    /// @param value the value");
+    sb.appendLine("    /// @throws IndexOutOfBoundsException if the index is out of bounds");
     sb.append("    public void add(long index, ").append(type.typeName).appendLine(" value) {");
     sb.appendLine("        if (index == size) {");
     sb.appendLine("            add(value);");
@@ -156,6 +158,7 @@ void generateClass(Path packageDir, Type type) throws IOException {
         sb.appendLine("    /// Inserts the given elements at the given index.");
         sb.appendLine("    /// @param index  the index of the elements to be inserted");
         sb.appendLine("    /// @param values the values");
+        sb.appendLine("    /// @throws IndexOutOfBoundsException if the index is out of bounds");
         sb.append("    public void addAll(long index, ").append(type.typeName).appendLine("[] values) {");
         sb.appendLine("        if (index == size) {");
         sb.appendLine("            addAll(values);");

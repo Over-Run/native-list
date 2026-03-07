@@ -44,6 +44,7 @@ public class BoolNativeList extends NativeList implements BoolNativeListView {
     /// Inserts the given element at the given index.
     /// @param index the index of the element to be inserted
     /// @param value the value
+    /// @throws IndexOutOfBoundsException if the index is out of bounds
     public void add(long index, boolean value) {
         if (index == size) {
             add(value);

@@ -244,6 +244,7 @@ public class NativeList implements NativeListView, AutoCloseable {
     ///
     /// @param index              the index of the element to be inserted
     /// @param elementRefConsumer the consumer accepting a slice of the data
+    /// @throws IndexOutOfBoundsException if the index is out of bounds
     public void add(long index, Consumer<MemorySegment> elementRefConsumer) {
         if (index == size) {
             add(elementRefConsumer);
@@ -272,6 +273,7 @@ public class NativeList implements NativeListView, AutoCloseable {
     /// @param index              the index of the elements to be inserted
     /// @param count              the count of element
     /// @param elementRefConsumer the consumer accepting a slice of the data
+    /// @throws IndexOutOfBoundsException if the index is out of bounds
     public void addAll(long index, long count, Consumer<MemorySegment> elementRefConsumer) {
         if (index == size) {
             addAll(count, elementRefConsumer);
@@ -287,7 +289,8 @@ public class NativeList implements NativeListView, AutoCloseable {
 
     /// Removes the specified element at the given index.
     ///
-    /// @param index the index of the elements to be removed
+    /// @param index the index of the element to be removed
+    /// @throws IndexOutOfBoundsException if the index is out of bounds
     public void remove(long index) {
         if (index == 0) {
             removeFirst();
@@ -304,6 +307,8 @@ public class NativeList implements NativeListView, AutoCloseable {
     }
 
     /// Removes the first element.
+    ///
+    /// @throws NoSuchElementException if this list is empty
     public void removeFirst() {
         if (size <= 0) {
             throw new NoSuchElementException();
@@ -315,12 +320,25 @@ public class NativeList implements NativeListView, AutoCloseable {
     }
 
     /// Removes the last element.
+    ///
+    /// @throws NoSuchElementException if this list is empty
     public void removeLast() {
         long last = size - 1;
         if (last < 0) {
             throw new NoSuchElementException();
         }
         size--;
+    }
+
+    /// Removes the specified elements at the given range, from `fromIndex` (inclusive) to `toIndex` (exclusive).
+    ///
+    /// @param fromIndex the index of the first element to be removed
+    /// @param toIndex   the index of the last element to be removed
+    /// @throws IndexOutOfBoundsException if the sub-range is out of bounds
+    public void removeAll(long fromIndex, long toIndex) {
+        Objects.checkFromToIndex(fromIndex, toIndex, size);
+        move(toIndex, fromIndex);
+        size -= toIndex - fromIndex;
     }
 
     private void reallocate(long newCapacity) {
@@ -338,15 +356,15 @@ public class NativeList implements NativeListView, AutoCloseable {
         }
     }
 
-    /// Moves the data, ranging from `fromIndex` to the end, to `toIndex`.
+    /// Moves the data, ranging from `fromIndex` to the end, to `dstIndex`.
     ///
     /// @param fromIndex the index of the first element to be moved
-    /// @param toIndex   the new index of the elements to be moved to
-    protected void move(long fromIndex, long toIndex) {
+    /// @param dstIndex  the new index of the elements to be moved to
+    protected void move(long fromIndex, long dstIndex) {
         MemorySegment.copy(data,
             elementLayout.scale(0, fromIndex),
             data,
-            elementLayout.scale(0, toIndex),
+            elementLayout.scale(0, dstIndex),
             elementLayout.scale(0, size - fromIndex));
     }
 

@@ -6,6 +6,7 @@ import java.util.*;
 public interface AddressNativeListView extends NativeListView {
     /// {@return the element at the given index}
     /// @param index the index of the element
+    /// @throws IndexOutOfBoundsException if the index is out of bounds
     MemorySegment get(long index);
 
     @Override AddressLayout elementLayout();

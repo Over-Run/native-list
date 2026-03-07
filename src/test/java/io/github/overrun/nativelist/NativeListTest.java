@@ -630,6 +630,109 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
+    void testRemoveAll(NativeList.AllocatorFactory allocatorFactory) {
+        try (var list = new ByteNativeList(allocatorFactory)) {
+            list.add((byte) 42);
+            list.add((byte) 43);
+            list.add((byte) 44);
+            list.add((byte) 45);
+            list.removeAll(1, 3);
+            assertEquals(2, list.size());
+            assertEquals((byte) 42, list.get(0));
+            assertEquals((byte) 45, list.get(1));
+        }
+
+        try (var list = new ShortNativeList(allocatorFactory)) {
+            list.add((short) 42);
+            list.add((short) 43);
+            list.add((short) 44);
+            list.add((short) 45);
+            list.removeAll(1, 3);
+            assertEquals(2, list.size());
+            assertEquals((short) 42, list.get(0));
+            assertEquals((short) 45, list.get(1));
+        }
+
+        try (var list = new IntNativeList(allocatorFactory)) {
+            list.add(42);
+            list.add(43);
+            list.add(44);
+            list.add(45);
+            list.removeAll(1, 3);
+            assertEquals(2, list.size());
+            assertEquals(42, list.get(0));
+            assertEquals(45, list.get(1));
+        }
+
+        try (var list = new LongNativeList(allocatorFactory)) {
+            list.add(42);
+            list.add(43);
+            list.add(44);
+            list.add(45);
+            list.removeAll(1, 3);
+            assertEquals(2, list.size());
+            assertEquals(42, list.get(0));
+            assertEquals(45, list.get(1));
+        }
+
+        try (var list = new FloatNativeList(allocatorFactory)) {
+            list.add(42);
+            list.add(43);
+            list.add(44);
+            list.add(45);
+            list.removeAll(1, 3);
+            assertEquals(2, list.size());
+            assertEquals(42, list.get(0));
+            assertEquals(45, list.get(1));
+        }
+
+        try (var list = new DoubleNativeList(allocatorFactory)) {
+            list.add(42);
+            list.add(43);
+            list.add(44);
+            list.add(45);
+            list.removeAll(1, 3);
+            assertEquals(2, list.size());
+            assertEquals(42, list.get(0));
+            assertEquals(45, list.get(1));
+        }
+
+        try (var list = new BoolNativeList(allocatorFactory)) {
+            list.add(true);
+            list.add(true);
+            list.add(true);
+            list.add(false);
+            list.removeAll(1, 3);
+            assertEquals(2, list.size());
+            assertTrue(list.get(0));
+            assertFalse(list.get(1));
+        }
+
+        try (var list = new CharNativeList(allocatorFactory)) {
+            list.add('A');
+            list.add('B');
+            list.add('C');
+            list.add('D');
+            list.removeAll(1, 3);
+            assertEquals(2, list.size());
+            assertEquals('A', list.get(0));
+            assertEquals('D', list.get(1));
+        }
+
+        try (var list = new AddressNativeList(allocatorFactory)) {
+            list.add(MemorySegment.ofAddress(42));
+            list.add(MemorySegment.ofAddress(43));
+            list.add(MemorySegment.ofAddress(44));
+            list.add(MemorySegment.ofAddress(45));
+            list.removeAll(1, 3);
+            assertEquals(2, list.size());
+            assertEquals(MemorySegment.ofAddress(42), list.get(0));
+            assertEquals(MemorySegment.ofAddress(45), list.get(1));
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("allocatorFactories")
     void testRemoveException(NativeList.AllocatorFactory allocatorFactory) {
         try (var list = new IntNativeList(allocatorFactory, 0)) {
             assertThrowsExactly(NoSuchElementException.class, list::removeFirst);
@@ -660,14 +763,9 @@ public class NativeListTest {
             return (int) VH_y.get(segment, 0L);
         }
 
-        public Point x(int value) {
-            VH_x.set(segment, 0L, value);
-            return this;
-        }
-
-        public Point y(int value) {
-            VH_y.set(segment, 0L, value);
-            return this;
+        public void set(int x, int y) {
+            VH_x.set(segment, 0L, x);
+            VH_y.set(segment, 0L, y);
         }
     }
 
@@ -675,15 +773,15 @@ public class NativeListTest {
     @MethodSource("allocatorFactories")
     void testElementRef(NativeList.AllocatorFactory allocatorFactory) {
         try (NativeList list = new NativeList(Point.LAYOUT, allocatorFactory)) {
-            list.add(0, segment -> new Point(segment).x(1).y(2));
-            list.add(0, segment -> new Point(segment).x(3).y(4));
+            list.add(0, segment -> new Point(segment).set(1, 2));
+            list.add(0, segment -> new Point(segment).set(3, 4));
             list.addAll(2, 2, segment -> {
-                new Point(segment).x(5).y(6);
-                new Point(segment.asSlice(Point.LAYOUT.byteSize())).x(7).y(8);
+                new Point(segment).set(5, 6);
+                new Point(segment.asSlice(Point.LAYOUT.byteSize())).set(7, 8);
             });
             list.addAll(2, 2, segment -> {
-                new Point(segment).x(9).y(10);
-                new Point(segment.asSlice(Point.LAYOUT.byteSize())).x(11).y(12);
+                new Point(segment).set(9, 10);
+                new Point(segment.asSlice(Point.LAYOUT.byteSize())).set(11, 12);
             });
 
             assertEquals(6, list.size());
@@ -704,8 +802,8 @@ public class NativeListTest {
     @MethodSource("allocatorFactories")
     void testMoveMethod(NativeList.AllocatorFactory allocatorFactory) {
         NativeList list1 = new NativeList(Point.LAYOUT, allocatorFactory);
-        list1.add(segment -> new Point(segment).x(1).y(2));
-        list1.add(segment -> new Point(segment).x(3).y(4));
+        list1.add(segment -> new Point(segment).set(1, 2));
+        list1.add(segment -> new Point(segment).set(3, 4));
         try (NativeList list2 = NativeList.move(allocatorFactory, list1)) {
             assertPointEquals(1, 2, new Point(list2.getElementRef(0)));
             assertPointEquals(3, 4, new Point(list2.getElementRef(1)));
