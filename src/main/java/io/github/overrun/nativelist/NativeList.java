@@ -10,6 +10,56 @@ import java.util.function.Consumer;
 ///
 /// The user is responsible for closing the native list.
 ///
+/// ## Allocator
+///
+/// An [allocator][Allocator] must be provided by the [`AllocatorFactory`][AllocatorFactory]
+/// to allocate memory for the native list.
+///
+/// ## Example
+///
+/// ```java
+/// /// struct Point {
+/// ///     int32 x;
+/// ///     int32 y;
+/// /// }
+/// class Point {
+///     static final StructLayout LAYOUT = MemoryLayout.structLayout(
+///         ValueLayout.JAVA_INT.withName("x"),
+///         ValueLayout.JAVA_INT.withName("y")
+///     );
+///     static final VarHandle VH_x = LAYOUT.varHandle(PathElement.groupElement("x"));
+///     static final VarHandle VH_y = LAYOUT.varHandle(PathElement.groupElement("y"));
+///     final MemorySegment segment;
+///
+///     Point(MemorySegment segment) { this.segment = segment; }
+///     int x() { return (int) VH_x.get(segment, 0L); }
+///     int y() { return (int) VH_y.get(segment, 0L); }
+///     void set(int x, int y) {
+///         VH_x.set(segment, 0L, x);
+///         VH_y.set(segment, 0L, y);
+///         return this;
+///     }
+/// }
+///
+/// void main() {
+///     // create a native list with the struct layout and confined arena
+///     try (var list = new NativeList(Point.LAYOUT, NativeList.Allocator::ofConfinedArena)) {
+///         // construct a point in place
+///         list.add(seg -> new Point(seg).set(1, 2));
+///         assertEquals(1, list.size());
+///         // get the point
+///         var p1 = new Point(list.getElementRef(0));
+///         // should be the same as p1
+///         var p2 = new Point(list.getElementRef(0));
+///         assertEquals(1, p1.x());
+///         assertEquals(2, p1.y());
+///         p1.set(3, 4);
+///         assertEquals(3, p2.x());
+///         assertEquals(4, p2.y());
+///     }
+/// }
+/// ```
+///
 /// @since 1.0.0
 public class NativeList implements NativeListView, AutoCloseable {
     private final MemoryLayout elementLayout;
