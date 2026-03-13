@@ -80,10 +80,10 @@ void generateClass(Path packageDir, Type type) throws IOException {
     sb.append("public class ").append(type.prefix).append("NativeList extends NativeList implements ").append(type.prefix).appendLine("NativeListView {");
 
     sb.append("    /// Constructor of [").append(type.prefix).appendLine("NativeList].");
-    sb.appendLine("    /// @param allocatorFactory a factory of the [allocator][Allocator]");
+    sb.appendLine("    /// @param allocatorFactory a factory of the [allocator][ListAllocator]");
     sb.appendLine("    /// @param initialCapacity  the initial capacity of the native list; defaults to 8");
     sb.appendLine("    /// @throws IllegalArgumentException if `initialCapacity < 0`");
-    sb.append("    public ").append(type.prefix).appendLine("NativeList(AllocatorFactory allocatorFactory, long initialCapacity) {");
+    sb.append("    public ").append(type.prefix).appendLine("NativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {");
     sb.append("        super(").append(type.valueLayout).appendLine(", allocatorFactory, initialCapacity);");
     sb.append("    }");
     sb.appendLine();
@@ -91,8 +91,8 @@ void generateClass(Path packageDir, Type type) throws IOException {
     sb.append("    /// Constructor of [").append(type.prefix).appendLine("NativeList].");
     sb.appendLine("    ///");
     sb.appendLine("    /// It is recommended to construct a native list with an initial capacity.");
-    sb.appendLine("    /// @param allocatorFactory a factory of the [allocator][Allocator]");
-    sb.append("    public ").append(type.prefix).appendLine("NativeList(AllocatorFactory allocatorFactory) {");
+    sb.appendLine("    /// @param allocatorFactory a factory of the [allocator][ListAllocator]");
+    sb.append("    public ").append(type.prefix).appendLine("NativeList(ListAllocatorFactory allocatorFactory) {");
     sb.append("        super(").append(type.valueLayout).appendLine(", allocatorFactory);");
     sb.appendLine("    }");
     sb.appendLine();
@@ -100,9 +100,9 @@ void generateClass(Path packageDir, Type type) throws IOException {
     sb.append("    /// Constructor of [").append(type.prefix).appendLine("NativeList].");
     sb.appendLine("    ///");
     sb.appendLine("    /// This copies element layout and data from `list`.");
-    sb.appendLine("    /// @param allocatorFactory a factory of the [allocator][Allocator]");
+    sb.appendLine("    /// @param allocatorFactory a factory of the [allocator][ListAllocator]");
     sb.appendLine("    /// @param list             the source native list");
-    sb.append("    public ").append(type.prefix).append("NativeList(AllocatorFactory allocatorFactory, ").append(type.prefix).appendLine("NativeList list) {");
+    sb.append("    public ").append(type.prefix).append("NativeList(ListAllocatorFactory allocatorFactory, ").append(type.prefix).appendLine("NativeList list) {");
     sb.appendLine("        super(allocatorFactory, list);");
     sb.appendLine("    }");
     sb.appendLine();

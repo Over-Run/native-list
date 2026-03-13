@@ -5,26 +5,26 @@ import java.util.*;
 /// The `MemorySegment` specialized version of [NativeList].
 public class AddressNativeList extends NativeList implements AddressNativeListView {
     /// Constructor of [AddressNativeList].
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param initialCapacity  the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public AddressNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+    public AddressNativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {
         super(ValueLayout.ADDRESS, allocatorFactory, initialCapacity);
     }
     /// Constructor of [AddressNativeList].
     ///
     /// It is recommended to construct a native list with an initial capacity.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
-    public AddressNativeList(AllocatorFactory allocatorFactory) {
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
+    public AddressNativeList(ListAllocatorFactory allocatorFactory) {
         super(ValueLayout.ADDRESS, allocatorFactory);
     }
 
     /// Constructor of [AddressNativeList].
     ///
     /// This copies element layout and data from `list`.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param list             the source native list
-    public AddressNativeList(AllocatorFactory allocatorFactory, AddressNativeList list) {
+    public AddressNativeList(ListAllocatorFactory allocatorFactory, AddressNativeList list) {
         super(allocatorFactory, list);
     }
 

@@ -4,7 +4,7 @@ import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 
 /// @since 1.0.0
-final class CAllocator implements NativeList.Allocator {
+final class CAllocator implements ListAllocator {
     private static final long ADDRESS_SIZE = ValueLayout.ADDRESS.byteSize();
     private static final long MAX_MALLOC_ALIGN = 2 * ADDRESS_SIZE;
     private static final long OFFSET_alignedPtrRaw = -MAX_MALLOC_ALIGN;

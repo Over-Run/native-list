@@ -5,26 +5,26 @@ import java.util.*;
 /// The `char` specialized version of [NativeList].
 public class CharNativeList extends NativeList implements CharNativeListView {
     /// Constructor of [CharNativeList].
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param initialCapacity  the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public CharNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+    public CharNativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {
         super(ValueLayout.JAVA_CHAR, allocatorFactory, initialCapacity);
     }
     /// Constructor of [CharNativeList].
     ///
     /// It is recommended to construct a native list with an initial capacity.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
-    public CharNativeList(AllocatorFactory allocatorFactory) {
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
+    public CharNativeList(ListAllocatorFactory allocatorFactory) {
         super(ValueLayout.JAVA_CHAR, allocatorFactory);
     }
 
     /// Constructor of [CharNativeList].
     ///
     /// This copies element layout and data from `list`.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param list             the source native list
-    public CharNativeList(AllocatorFactory allocatorFactory, CharNativeList list) {
+    public CharNativeList(ListAllocatorFactory allocatorFactory, CharNativeList list) {
         super(allocatorFactory, list);
     }
 

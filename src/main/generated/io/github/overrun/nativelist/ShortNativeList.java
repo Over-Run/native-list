@@ -5,26 +5,26 @@ import java.util.*;
 /// The `short` specialized version of [NativeList].
 public class ShortNativeList extends NativeList implements ShortNativeListView {
     /// Constructor of [ShortNativeList].
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param initialCapacity  the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public ShortNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+    public ShortNativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {
         super(ValueLayout.JAVA_SHORT, allocatorFactory, initialCapacity);
     }
     /// Constructor of [ShortNativeList].
     ///
     /// It is recommended to construct a native list with an initial capacity.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
-    public ShortNativeList(AllocatorFactory allocatorFactory) {
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
+    public ShortNativeList(ListAllocatorFactory allocatorFactory) {
         super(ValueLayout.JAVA_SHORT, allocatorFactory);
     }
 
     /// Constructor of [ShortNativeList].
     ///
     /// This copies element layout and data from `list`.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param list             the source native list
-    public ShortNativeList(AllocatorFactory allocatorFactory, ShortNativeList list) {
+    public ShortNativeList(ListAllocatorFactory allocatorFactory, ShortNativeList list) {
         super(allocatorFactory, list);
     }
 

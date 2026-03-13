@@ -16,24 +16,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /// @since 1.0.0
 public class NativeListTest {
-    static Stream<NativeList.AllocatorFactory> allocatorFactories() {
+    static Stream<ListAllocatorFactory> allocatorFactories() {
         return Stream.of(
-            NativeList.Allocator::ofConfinedArena,
-            NativeList.Allocator::ofSharedArena,
-            NativeList.Allocator::ofAutoArena,
-            NativeList.Allocator::c
+            ListAllocator::ofConfinedArena,
+            ListAllocator::ofSharedArena,
+            ListAllocator::ofAutoArena,
+            ListAllocator::c
         );
     }
 
     @Test
     void testConstructorCheck() {
         assertThrowsExactly(IllegalArgumentException.class,
-            () -> new IntNativeList(NativeList.Allocator::ofConfinedArena, -1).close());
+            () -> new IntNativeList(ListAllocator::ofConfinedArena, -1).close());
     }
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testGet(NativeList.AllocatorFactory allocatorFactory) {
+    void testGet(ListAllocatorFactory allocatorFactory) {
         try (var list = new ByteNativeList(allocatorFactory)) {
             list.add((byte) 42);
             list.add((byte) 43);
@@ -100,7 +100,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testAddAtIndex(NativeList.AllocatorFactory allocatorFactory) {
+    void testAddAtIndex(ListAllocatorFactory allocatorFactory) {
         try (var list = new ByteNativeList(allocatorFactory)) {
             list.add(0, (byte) 42);
             list.add(0, (byte) 43);
@@ -167,7 +167,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testAddAll(NativeList.AllocatorFactory allocatorFactory) {
+    void testAddAll(ListAllocatorFactory allocatorFactory) {
         try (var list = new ByteNativeList(allocatorFactory)) {
             list.addAll(new byte[0]);
             list.addAll(new byte[]{43, 42});
@@ -234,7 +234,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testAddAllAtIndex(NativeList.AllocatorFactory allocatorFactory) {
+    void testAddAllAtIndex(ListAllocatorFactory allocatorFactory) {
         try (var list = new ByteNativeList(allocatorFactory)) {
             list.add((byte) 44);
             list.addAll(0, new byte[0]);
@@ -322,7 +322,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testExpansion(NativeList.AllocatorFactory allocatorFactory) {
+    void testExpansion(ListAllocatorFactory allocatorFactory) {
         try (var list = new ByteNativeList(allocatorFactory, 1)) {
             list.add((byte) 42);
             list.add((byte) 43);
@@ -407,7 +407,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testSizeAndCapacity(NativeList.AllocatorFactory allocatorFactory) {
+    void testSizeAndCapacity(ListAllocatorFactory allocatorFactory) {
         try (var list = new IntNativeList(allocatorFactory, 8)) {
             assertTrue(list.isEmpty());
             assertEquals(8, list.capacity());
@@ -427,7 +427,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testZeroCapacity(NativeList.AllocatorFactory allocatorFactory) {
+    void testZeroCapacity(ListAllocatorFactory allocatorFactory) {
         try (var list = new IntNativeList(allocatorFactory, 0)) {
             assertEquals(0, list.capacity());
             assertEquals(MemorySegment.NULL, list.data());
@@ -436,7 +436,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testCopyConstructor(NativeList.AllocatorFactory allocatorFactory) {
+    void testCopyConstructor(ListAllocatorFactory allocatorFactory) {
         try (var list0 = new ByteNativeList(allocatorFactory)) {
             list0.add((byte) 42);
             list0.add((byte) 43);
@@ -521,7 +521,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testToArray(NativeList.AllocatorFactory allocatorFactory) {
+    void testToArray(ListAllocatorFactory allocatorFactory) {
         try (var list = new ByteNativeList(allocatorFactory)) {
             list.add((byte) 42);
             list.add((byte) 43);
@@ -567,7 +567,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testElementLayout(NativeList.AllocatorFactory allocatorFactory) {
+    void testElementLayout(ListAllocatorFactory allocatorFactory) {
         try (var list = new ByteNativeList(allocatorFactory, 0)) {
             assertEquals(ValueLayout.JAVA_BYTE, list.elementLayout());
         }
@@ -599,7 +599,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testRemove(NativeList.AllocatorFactory allocatorFactory) {
+    void testRemove(ListAllocatorFactory allocatorFactory) {
         try (var list = new IntNativeList(allocatorFactory)) {
             for (int i = 1; i <= 10; i++) {
                 list.add(i);
@@ -630,7 +630,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testRemoveAll(NativeList.AllocatorFactory allocatorFactory) {
+    void testRemoveAll(ListAllocatorFactory allocatorFactory) {
         try (var list = new ByteNativeList(allocatorFactory)) {
             list.add((byte) 42);
             list.add((byte) 43);
@@ -733,7 +733,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testRemoveException(NativeList.AllocatorFactory allocatorFactory) {
+    void testRemoveException(ListAllocatorFactory allocatorFactory) {
         try (var list = new IntNativeList(allocatorFactory, 0)) {
             assertThrowsExactly(NoSuchElementException.class, list::removeFirst);
             assertThrowsExactly(NoSuchElementException.class, list::removeLast);
@@ -771,7 +771,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testElementRef(NativeList.AllocatorFactory allocatorFactory) {
+    void testElementRef(ListAllocatorFactory allocatorFactory) {
         try (NativeList list = new NativeList(Point.LAYOUT, allocatorFactory)) {
             list.add(0, segment -> new Point(segment).set(1, 2));
             list.add(0, segment -> new Point(segment).set(3, 4));
@@ -800,7 +800,7 @@ public class NativeListTest {
 
     @ParameterizedTest
     @MethodSource("allocatorFactories")
-    void testMoveMethod(NativeList.AllocatorFactory allocatorFactory) {
+    void testMoveMethod(ListAllocatorFactory allocatorFactory) {
         NativeList list1 = new NativeList(Point.LAYOUT, allocatorFactory);
         list1.add(segment -> new Point(segment).set(1, 2));
         list1.add(segment -> new Point(segment).set(3, 4));

@@ -5,26 +5,26 @@ import java.util.*;
 /// The `int` specialized version of [NativeList].
 public class IntNativeList extends NativeList implements IntNativeListView {
     /// Constructor of [IntNativeList].
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param initialCapacity  the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public IntNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+    public IntNativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {
         super(ValueLayout.JAVA_INT, allocatorFactory, initialCapacity);
     }
     /// Constructor of [IntNativeList].
     ///
     /// It is recommended to construct a native list with an initial capacity.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
-    public IntNativeList(AllocatorFactory allocatorFactory) {
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
+    public IntNativeList(ListAllocatorFactory allocatorFactory) {
         super(ValueLayout.JAVA_INT, allocatorFactory);
     }
 
     /// Constructor of [IntNativeList].
     ///
     /// This copies element layout and data from `list`.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param list             the source native list
-    public IntNativeList(AllocatorFactory allocatorFactory, IntNativeList list) {
+    public IntNativeList(ListAllocatorFactory allocatorFactory, IntNativeList list) {
         super(allocatorFactory, list);
     }
 

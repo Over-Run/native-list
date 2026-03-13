@@ -5,7 +5,7 @@ import java.lang.foreign.MemorySegment;
 import java.util.Objects;
 
 /// @since 1.0.0
-final class ArenaAllocator implements NativeList.Allocator {
+final class ArenaAllocator implements ListAllocator {
     private final Arena arena;
     private final boolean arenaCloseable;
 

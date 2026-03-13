@@ -5,26 +5,26 @@ import java.util.*;
 /// The `float` specialized version of [NativeList].
 public class FloatNativeList extends NativeList implements FloatNativeListView {
     /// Constructor of [FloatNativeList].
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param initialCapacity  the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public FloatNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+    public FloatNativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {
         super(ValueLayout.JAVA_FLOAT, allocatorFactory, initialCapacity);
     }
     /// Constructor of [FloatNativeList].
     ///
     /// It is recommended to construct a native list with an initial capacity.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
-    public FloatNativeList(AllocatorFactory allocatorFactory) {
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
+    public FloatNativeList(ListAllocatorFactory allocatorFactory) {
         super(ValueLayout.JAVA_FLOAT, allocatorFactory);
     }
 
     /// Constructor of [FloatNativeList].
     ///
     /// This copies element layout and data from `list`.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param list             the source native list
-    public FloatNativeList(AllocatorFactory allocatorFactory, FloatNativeList list) {
+    public FloatNativeList(ListAllocatorFactory allocatorFactory, FloatNativeList list) {
         super(allocatorFactory, list);
     }
 

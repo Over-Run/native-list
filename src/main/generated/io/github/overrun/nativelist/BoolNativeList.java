@@ -5,26 +5,26 @@ import java.util.*;
 /// The `boolean` specialized version of [NativeList].
 public class BoolNativeList extends NativeList implements BoolNativeListView {
     /// Constructor of [BoolNativeList].
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param initialCapacity  the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public BoolNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+    public BoolNativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {
         super(ValueLayout.JAVA_BOOLEAN, allocatorFactory, initialCapacity);
     }
     /// Constructor of [BoolNativeList].
     ///
     /// It is recommended to construct a native list with an initial capacity.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
-    public BoolNativeList(AllocatorFactory allocatorFactory) {
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
+    public BoolNativeList(ListAllocatorFactory allocatorFactory) {
         super(ValueLayout.JAVA_BOOLEAN, allocatorFactory);
     }
 
     /// Constructor of [BoolNativeList].
     ///
     /// This copies element layout and data from `list`.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param list             the source native list
-    public BoolNativeList(AllocatorFactory allocatorFactory, BoolNativeList list) {
+    public BoolNativeList(ListAllocatorFactory allocatorFactory, BoolNativeList list) {
         super(allocatorFactory, list);
     }
 

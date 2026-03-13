@@ -5,26 +5,26 @@ import java.util.*;
 /// The `byte` specialized version of [NativeList].
 public class ByteNativeList extends NativeList implements ByteNativeListView {
     /// Constructor of [ByteNativeList].
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param initialCapacity  the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public ByteNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+    public ByteNativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {
         super(ValueLayout.JAVA_BYTE, allocatorFactory, initialCapacity);
     }
     /// Constructor of [ByteNativeList].
     ///
     /// It is recommended to construct a native list with an initial capacity.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
-    public ByteNativeList(AllocatorFactory allocatorFactory) {
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
+    public ByteNativeList(ListAllocatorFactory allocatorFactory) {
         super(ValueLayout.JAVA_BYTE, allocatorFactory);
     }
 
     /// Constructor of [ByteNativeList].
     ///
     /// This copies element layout and data from `list`.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param list             the source native list
-    public ByteNativeList(AllocatorFactory allocatorFactory, ByteNativeList list) {
+    public ByteNativeList(ListAllocatorFactory allocatorFactory, ByteNativeList list) {
         super(allocatorFactory, list);
     }
 

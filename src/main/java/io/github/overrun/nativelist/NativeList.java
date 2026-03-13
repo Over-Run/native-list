@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 ///
 /// ## Allocator
 ///
-/// An [allocator][Allocator] must be provided by the [`AllocatorFactory`][AllocatorFactory]
+/// An [allocator][ListAllocator] must be provided by the [allocator factory][ListAllocatorFactory]
 /// to allocate memory for the native list.
 ///
 /// ## Example
@@ -43,7 +43,7 @@ import java.util.function.Consumer;
 ///
 /// void main() {
 ///     // create a native list with the struct layout and confined arena
-///     try (var list = new NativeList(Point.LAYOUT, NativeList.Allocator::ofConfinedArena)) {
+///     try (var list = new NativeList(Point.LAYOUT, ListAllocator::ofConfinedArena)) {
 ///         // construct a point in place
 ///         list.add(seg -> new Point(seg).set(1, 2));
 ///         assertEquals(1, list.size());
@@ -63,106 +63,20 @@ import java.util.function.Consumer;
 /// @since 1.0.0
 public class NativeList implements NativeListView, AutoCloseable {
     private final MemoryLayout elementLayout;
-    private final Allocator allocator;
+    private final ListAllocator allocator;
     /// The data.
     protected MemorySegment data;
     private long capacity;
     /// The element count.
     protected long size = 0;
 
-    /// Provides methods for [NativeList] to allocate memory.
-    public interface Allocator {
-        /// Allocates a block of memory with the given size and alignment constraint.
-        ///
-        /// The implementation **MUST NOT** return [MemorySegment#NULL].
-        /// They should instead raise [OutOfMemoryError].
-        ///
-        /// @param byteSize      the size of the memory to be allocated in bytes
-        /// @param byteAlignment the alignment constraint in bytes
-        /// @return a new native memory segment
-        /// @throws IllegalArgumentException if `bytesSize < 0`, `byteAlignment <= 0`, or if `byteAlignment` is not a power of 2
-        /// @throws OutOfMemoryError         if error occurs when allocating memory
-        MemorySegment allocate(long byteSize, long byteAlignment);
-
-        /// Allocates a block of memory with the contents of the given memory segment and the alignment constraint.
-        ///
-        /// The implementation **MUST NOT** return [MemorySegment#NULL].
-        /// They should instead raise [OutOfMemoryError].
-        ///
-        /// @param segment       the memory segment to be copied
-        /// @param byteAlignment the alignment constraint in bytes
-        /// @return a new native memory segment
-        /// @throws IllegalArgumentException if `byteAlignment <= 0`, or if `byteAlignment` is not a power of 2
-        /// @throws OutOfMemoryError         if error occurs when allocating memory
-        default MemorySegment allocateFrom(MemorySegment segment, long byteAlignment) {
-            MemorySegment newSegment = allocate(segment.byteSize(), byteAlignment);
-            MemorySegment.copy(segment, 0, newSegment, 0, segment.byteSize());
-            return newSegment;
-        }
-
-        /// Reallocates the memory segment with a new size.
-        ///
-        /// The implementation **can only** return [MemorySegment#NULL] when `newByteSize == 0`.
-        /// Otherwise, they should instead raise [OutOfMemoryError].
-        ///
-        /// @param segment       the memory segment to be reallocated, which **may** be [MemorySegment#NULL]
-        /// @param newByteSize   the new size in bytes, which **may** be smaller than the previous one
-        /// @param byteAlignment the alignment constraint in bytes
-        /// @return a new native memory segment
-        /// @throws IllegalArgumentException if `bytesSize < 0`, `byteAlignment <= 0`, or if `byteAlignment` is not a power of 2
-        /// @throws OutOfMemoryError         if error occurs when reallocating memory
-        MemorySegment reallocate(MemorySegment segment, long newByteSize, long byteAlignment);
-
-        /// Releases the given memory segment or the arena associated to this allocator.
-        ///
-        /// This method does no operation if `segment` is [MemorySegment#NULL].
-        ///
-        /// @param segment the memory segment to be released, which **may** be [MemorySegment#NULL]
-        void free(MemorySegment segment);
-
-        /// Creates an allocator with the [confined arena][java.lang.foreign.Arena#ofConfined()].
-        ///
-        /// @return the allocator
-        static Allocator ofConfinedArena() {
-            return ArenaAllocator.ofConfined();
-        }
-
-        /// Creates an allocator with the [shared arena][java.lang.foreign.Arena#ofShared()].
-        ///
-        /// @return the allocator
-        static Allocator ofSharedArena() {
-            return ArenaAllocator.ofShared();
-        }
-
-        /// Creates an allocator with the [auto arena][java.lang.foreign.Arena#ofAuto()].
-        ///
-        /// @return the allocator
-        static Allocator ofAutoArena() {
-            return ArenaAllocator.ofAuto();
-        }
-
-        /// Creates an allocator with C `malloc` and `free`.
-        ///
-        /// @return the allocator
-        static Allocator c() {
-            return CAllocator.of();
-        }
-    }
-
-    /// Represents a factory of the [allocator][Allocator].
-    @FunctionalInterface
-    public interface AllocatorFactory {
-        /// {@return a newly created allocator}
-        Allocator create();
-    }
-
     /// Constructor of [NativeList].
     ///
     /// @param elementLayout    the memory layout of the element
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param initialCapacity  the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public NativeList(MemoryLayout elementLayout, AllocatorFactory allocatorFactory, long initialCapacity) {
+    public NativeList(MemoryLayout elementLayout, ListAllocatorFactory allocatorFactory, long initialCapacity) {
         this.elementLayout = elementLayout;
         this.capacity = initialCapacity;
         this.allocator = allocatorFactory.create();
@@ -180,10 +94,10 @@ public class NativeList implements NativeListView, AutoCloseable {
     /// It is recommended to construct a native list with an initial capacity.
     ///
     /// @param elementLayout    the memory layout of the element
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    /// @see NativeList#NativeList(MemoryLayout, AllocatorFactory, long)
-    public NativeList(MemoryLayout elementLayout, AllocatorFactory allocatorFactory) {
+    /// @see NativeList#NativeList(MemoryLayout, ListAllocatorFactory, long)
+    public NativeList(MemoryLayout elementLayout, ListAllocatorFactory allocatorFactory) {
         this(elementLayout, allocatorFactory, 8);
     }
 
@@ -191,9 +105,9 @@ public class NativeList implements NativeListView, AutoCloseable {
     ///
     /// This copies element layout and data from `list`.
     ///
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param list             the source native list
-    public NativeList(AllocatorFactory allocatorFactory, NativeList list) {
+    public NativeList(ListAllocatorFactory allocatorFactory, NativeList list) {
         this.elementLayout = list.elementLayout;
         this.capacity = list.capacity;
         this.size = list.size;
@@ -204,10 +118,10 @@ public class NativeList implements NativeListView, AutoCloseable {
     /// Creates a new native list with the given allocator factory,
     /// copies data from `list` and frees up `list`.
     ///
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param list             the source native list
     /// @return a native list
-    public static NativeList move(AllocatorFactory allocatorFactory, NativeList list) {
+    public static NativeList move(ListAllocatorFactory allocatorFactory, NativeList list) {
         NativeList nativeList = new NativeList(allocatorFactory, list);
         list.free();
         return nativeList;
@@ -386,6 +300,35 @@ public class NativeList implements NativeListView, AutoCloseable {
         }
     }
 
+    /// Sets the element count to the given one.
+    ///
+    /// @param newSize the new size
+    public void resize(long newSize) {
+        if (newSize > capacity) {
+            reallocate(newSize);
+        }
+        if (newSize > size) {
+            asSliceNoCheck(size, newSize - size).fill((byte) 0);
+        }
+        size = newSize;
+    }
+
+    /// Sets the element count to the given one and initialize the new elements with the given value, if `newSize > size()`.
+    ///
+    /// @param newSize  the new size
+    /// @param consumer a consumer accepting a slice of an element
+    public void resize(long newSize, Consumer<MemorySegment> consumer) {
+        if (newSize > capacity) {
+            reallocate(newSize);
+        }
+        if (newSize > size) {
+            asSliceNoCheck(size, newSize - size)
+                .elements(elementLayout)
+                .forEach(consumer);
+        }
+        size = newSize;
+    }
+
     @Override
     public MemoryLayout elementLayout() {
         return elementLayout;
@@ -440,7 +383,7 @@ public class NativeList implements NativeListView, AutoCloseable {
         size = 0;
     }
 
-    /// Releases this list with [`Allocator::free`][Allocator#free(MemorySegment)].
+    /// Releases this list with [`Allocator::free`][ListAllocator#free(MemorySegment)].
     public void free() {
         allocator.free(data);
         data = MemorySegment.NULL;

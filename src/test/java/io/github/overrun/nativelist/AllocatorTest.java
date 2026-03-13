@@ -12,17 +12,17 @@ public class AllocatorTest {
     @Test
     void testCAllocatorSizeAndAlignCheck() {
         assertThrowsExactly(IllegalArgumentException.class,
-            () -> NativeList.Allocator.c().allocate(-1, -1));
+            () -> ListAllocator.c().allocate(-1, -1));
         assertThrowsExactly(IllegalArgumentException.class,
-            () -> NativeList.Allocator.c().allocate(0, -1));
+            () -> ListAllocator.c().allocate(0, -1));
         assertThrowsExactly(IllegalArgumentException.class,
-            () -> NativeList.Allocator.c().allocate(0, 3));
+            () -> ListAllocator.c().allocate(0, 3));
     }
 
     @Test
     void testCAllocatorRealloc() {
         assertDoesNotThrow(() -> {
-            NativeList.Allocator c = NativeList.Allocator.c();
+            ListAllocator c = ListAllocator.c();
 
             MemorySegment segment = c.reallocate(MemorySegment.NULL, 1, 1);
             c.free(segment);
@@ -31,7 +31,7 @@ public class AllocatorTest {
             c.reallocate(segment, 0, 1);
         });
 
-        NativeList.Allocator c = NativeList.Allocator.c();
+        ListAllocator c = ListAllocator.c();
         MemorySegment segment1 = c.allocate(1, 1);
         MemorySegment segment2 = c.reallocate(segment1, 1, 1);
         try {
@@ -58,7 +58,7 @@ public class AllocatorTest {
 
     @Test
     void testArenaAllocatorRealloc() {
-        NativeList.Allocator allocator = NativeList.Allocator.ofAutoArena();
+        ListAllocator allocator = ListAllocator.ofAutoArena();
 
         // nullptr, > 0
         MemorySegment segment = allocator.reallocate(MemorySegment.NULL, 1, 1);
@@ -97,8 +97,8 @@ public class AllocatorTest {
 
     @Test
     void testArenaAllocatorFree() {
-        assertDoesNotThrow(() -> NativeList.Allocator.ofAutoArena().free(MemorySegment.NULL));
+        assertDoesNotThrow(() -> ListAllocator.ofAutoArena().free(MemorySegment.NULL));
         assertThrowsExactly(IllegalArgumentException.class,
-            () -> NativeList.Allocator.ofAutoArena().free(MemorySegment.ofAddress(1)));
+            () -> ListAllocator.ofAutoArena().free(MemorySegment.ofAddress(1)));
     }
 }

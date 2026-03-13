@@ -5,26 +5,26 @@ import java.util.*;
 /// The `long` specialized version of [NativeList].
 public class LongNativeList extends NativeList implements LongNativeListView {
     /// Constructor of [LongNativeList].
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param initialCapacity  the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public LongNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+    public LongNativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {
         super(ValueLayout.JAVA_LONG, allocatorFactory, initialCapacity);
     }
     /// Constructor of [LongNativeList].
     ///
     /// It is recommended to construct a native list with an initial capacity.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
-    public LongNativeList(AllocatorFactory allocatorFactory) {
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
+    public LongNativeList(ListAllocatorFactory allocatorFactory) {
         super(ValueLayout.JAVA_LONG, allocatorFactory);
     }
 
     /// Constructor of [LongNativeList].
     ///
     /// This copies element layout and data from `list`.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param list             the source native list
-    public LongNativeList(AllocatorFactory allocatorFactory, LongNativeList list) {
+    public LongNativeList(ListAllocatorFactory allocatorFactory, LongNativeList list) {
         super(allocatorFactory, list);
     }
 

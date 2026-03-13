@@ -5,26 +5,26 @@ import java.util.*;
 /// The `double` specialized version of [NativeList].
 public class DoubleNativeList extends NativeList implements DoubleNativeListView {
     /// Constructor of [DoubleNativeList].
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param initialCapacity  the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public DoubleNativeList(AllocatorFactory allocatorFactory, long initialCapacity) {
+    public DoubleNativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {
         super(ValueLayout.JAVA_DOUBLE, allocatorFactory, initialCapacity);
     }
     /// Constructor of [DoubleNativeList].
     ///
     /// It is recommended to construct a native list with an initial capacity.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
-    public DoubleNativeList(AllocatorFactory allocatorFactory) {
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
+    public DoubleNativeList(ListAllocatorFactory allocatorFactory) {
         super(ValueLayout.JAVA_DOUBLE, allocatorFactory);
     }
 
     /// Constructor of [DoubleNativeList].
     ///
     /// This copies element layout and data from `list`.
-    /// @param allocatorFactory a factory of the [allocator][Allocator]
+    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
     /// @param list             the source native list
-    public DoubleNativeList(AllocatorFactory allocatorFactory, DoubleNativeList list) {
+    public DoubleNativeList(ListAllocatorFactory allocatorFactory, DoubleNativeList list) {
         super(allocatorFactory, list);
     }
 
