@@ -1,11 +1,14 @@
+import org.jreleaser.model.Active
+
 plugins {
     `java-library`
     idea
     `maven-publish`
+    id("org.jreleaser") version "1.23.0"
 }
 
 group = "io.github.over-run"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -58,6 +61,13 @@ tasks.withType<JavaCompile> {
     options.release = 25
 }
 
+publishing.repositories {
+    maven {
+        name = "staging"
+        url = uri(layout.buildDirectory.dir("staging-deploy"))
+    }
+}
+
 publishing.publications {
     register<MavenPublication>("mavenPublication") {
         groupId = project.group.toString()
@@ -65,6 +75,60 @@ publishing.publications {
         version = project.version.toString()
         from(components["java"])
         pom {
+            name = "Native List"
+            description = "Native list is a resizable array backed by memory segment."
+            url = "https://github.com/Over-Run/native-list"
+            licenses {
+                license {
+                    name = "MIT License"
+                    url = "https://raw.githubusercontent.com/Over-Run/native-list/refs/heads/main/LICENSE"
+                }
+            }
+            developers {
+                developer {
+                    name = "squid233"
+                    organization = "Overrun Organization"
+                    organizationUrl = "https://github.com/Over-Run"
+                }
+            }
+            scm {
+                connection = "scm:git:git://github.com/Over-Run/native-list.git"
+                developerConnection = "scm:git:ssh://github.com:Over-Run/native-list.git"
+                url = "https://github.com/Over-Run/native-list"
+            }
+        }
+    }
+}
+
+jreleaser {
+    signing {
+        pgp {
+            active = Active.ALWAYS
+            armored = true
+        }
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                mavenCentral {
+                    register("release-deploy") {
+                        active = Active.RELEASE
+                        url = "https://central.sonatype.com/api/v1/publisher"
+                        stagingRepository("build/staging-deploy")
+                    }
+                }
+                nexus2 {
+                    register("snapshot-deploy") {
+                        active = Active.SNAPSHOT
+                        snapshotUrl = "https://central.sonatype.com/repository/maven-snapshots/"
+                        applyMavenCentralRules = true
+                        snapshotSupported = true
+                        closeRepository = true
+                        releaseRepository = true
+                        stagingRepository("build/staging-deploy")
+                    }
+                }
+            }
         }
     }
 }
