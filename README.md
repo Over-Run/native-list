@@ -15,6 +15,8 @@ void main() {
 }
 ```
 
+Check [wiki](https://github.com/Over-Run/native-list/wiki) for details.
+
 ## Import as Dependency
 
 This library requires JDK 25.
@@ -28,7 +30,7 @@ Maven:
 <dependency>
     <groupId>io.github.over-run</groupId>
     <artifactId>native-list</artifactId>
-    <version>&lt;nativeListVersion&gt;</version>
+    <version>${nativeListVersion}</version>
 </dependency>
 ```
 
@@ -36,6 +38,6 @@ Gradle:
 
 ```kotlin
 dependencies {
-    implementation("io.github.over-run:native-list:<nativeListVersion>")
+    implementation("io.github.over-run:native-list:${nativeListVersion}")
 }
 ```
