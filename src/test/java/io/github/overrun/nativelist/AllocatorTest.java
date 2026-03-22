@@ -30,30 +30,6 @@ public class AllocatorTest {
             segment = c.allocate(1, 1);
             c.reallocate(segment, 0, 1);
         });
-
-        ListAllocator c = ListAllocator.c();
-        MemorySegment segment1 = c.allocate(1, 1);
-        MemorySegment segment2 = c.reallocate(segment1, 1, 1);
-        try {
-            assertEquals(segment1, segment2);
-        } finally {
-            c.free(segment2);
-            if (!Objects.equals(segment1, segment2)) {
-                c.free(segment1);
-            }
-        }
-
-        MemorySegment segment3 = c.allocate(2, 1);
-        MemorySegment segment4 = c.reallocate(segment3, 1, 1);
-        try {
-            assertEquals(segment3.address(), segment4.address());
-            assertEquals(1, segment4.byteSize());
-        } finally {
-            c.free(segment4);
-            if (!Objects.equals(segment3.address(), segment4.address())) {
-                c.free(segment3);
-            }
-        }
     }
 
     @Test

@@ -76,10 +76,34 @@ public interface ListAllocator {
         return ArenaAllocator.ofAuto();
     }
 
-    /// Creates an allocator with C `malloc` and `free`.
+    /// Creates an allocator with C `malloc`, `realloc` and `free`.
     ///
     /// @return the allocator
     static ListAllocator c() {
         return CAllocator.of();
+    }
+
+    /// Checks whether `byteAlignment > 0` and `byteAlignment` is a power of 2.
+    ///
+    /// @param byteAlignment the alignment constraint in bytes
+    /// @throws IllegalArgumentException if `byteAlignment <= 0`, or if `byteAlignment` is not a power of 2
+    /// @since 1.1.0
+    static void checkAlignment(long byteAlignment) {
+        if (byteAlignment <= 0 || (byteAlignment & (byteAlignment - 1)) != 0) {
+            throw new IllegalArgumentException("Invalid alignment constraint: " + byteAlignment);
+        }
+    }
+
+    /// Checks whether `bytesSize >= 0`, `byteAlignment > 0` and `byteAlignment` is a power of 2.
+    ///
+    /// @param byteSize      the size of the memory to be allocated in bytes
+    /// @param byteAlignment the alignment constraint in bytes
+    /// @throws IllegalArgumentException if `bytesSize < 0`, `byteAlignment <= 0`, or if `byteAlignment` is not a power of 2
+    /// @since 1.1.0
+    static void checkSizeAndAlignment(long byteSize, long byteAlignment) {
+        if (byteSize < 0) {
+            throw new IllegalArgumentException("The byte size is negative: " + byteSize);
+        }
+        checkAlignment(byteAlignment);
     }
 }
