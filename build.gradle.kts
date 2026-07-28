@@ -4,7 +4,7 @@ plugins {
     `java-library`
     idea
     `maven-publish`
-    id("org.jreleaser") version "1.23.0"
+    id("org.jreleaser") version "1.25.0"
 }
 
 group = "io.github.over-run"
