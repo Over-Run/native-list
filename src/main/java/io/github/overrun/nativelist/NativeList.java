@@ -42,8 +42,8 @@ import java.util.function.Consumer;
 /// }
 ///
 /// void main() {
-///     // create a native list with the struct layout and confined arena
-///     try (var list = new NativeList(Point.LAYOUT, ListAllocator::ofConfinedArena)) {
+///     // create a native list with the struct layout and C allocator
+///     try (var list = new NativeList(Point.LAYOUT, ListAllocator.c())) {
 ///         // construct a point in place
 ///         list.add(seg -> new Point(seg).set(1, 2));
 ///         assertEquals(1, list.size());
