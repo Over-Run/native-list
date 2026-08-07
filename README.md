@@ -6,7 +6,7 @@ Native list is a resizable array backed by `MemorySegment`.
 
 ```java
 void main() {
-    try (var list = new IntNativeList(ListAllocator::ofConfinedArena)) {
+    try (var list = new IntNativeList(ListAllocator.c())) {
         list.add(42);
         list.add(43);
         assertEquals(42, list.get(0));
@@ -39,5 +39,20 @@ Gradle:
 ```kotlin
 dependencies {
     implementation("io.github.over-run:native-list:${nativeListVersion}")
+}
+```
+
+### Integrate with LWJGL 3
+
+This library provides a list allocator using `MemoryUtil` of LWJGL 3.
+
+- Maven coordinate: `io.github.over-run:native-list-lwjgl3`
+- Version: ![Maven Central Version](https://img.shields.io/maven-central/v/io.github.over-run/native-list-lwjgl3)
+
+Gradle:
+
+```kotlin
+dependencies {
+    implementation("io.github.over-run:native-list-lwjgl3:${nativeListLwjgl3Version}")
 }
 ```

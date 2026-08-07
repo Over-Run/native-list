@@ -5,27 +5,27 @@ import java.util.*;
 /// The `float` specialized version of [NativeList].
 public class FloatNativeList extends NativeList implements FloatNativeListView {
     /// Constructor of [FloatNativeList].
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    /// @param initialCapacity  the initial capacity of the native list; defaults to 8
+    /// @param allocator       the [allocator][ListAllocator]
+    /// @param initialCapacity the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public FloatNativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {
-        super(ValueLayout.JAVA_FLOAT, allocatorFactory, initialCapacity);
+    public FloatNativeList(ListAllocator allocator, long initialCapacity) {
+        super(ValueLayout.JAVA_FLOAT, allocator, initialCapacity);
     }
     /// Constructor of [FloatNativeList].
     ///
     /// It is recommended to construct a native list with an initial capacity.
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    public FloatNativeList(ListAllocatorFactory allocatorFactory) {
-        super(ValueLayout.JAVA_FLOAT, allocatorFactory);
+    /// @param allocator the [allocator][ListAllocator]
+    public FloatNativeList(ListAllocator allocator) {
+        super(ValueLayout.JAVA_FLOAT, allocator);
     }
 
     /// Constructor of [FloatNativeList].
     ///
     /// This copies element layout and data from `list`.
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    /// @param list             the source native list
-    public FloatNativeList(ListAllocatorFactory allocatorFactory, FloatNativeList list) {
-        super(allocatorFactory, list);
+    /// @param allocator the [allocator][ListAllocator]
+    /// @param list      the source native list
+    public FloatNativeList(ListAllocator allocator, FloatNativeList list) {
+        super(allocator, list);
     }
 
     @Override public float get(long index) {

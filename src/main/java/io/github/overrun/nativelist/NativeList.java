@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 ///
 /// ## Allocator
 ///
-/// An [allocator][ListAllocator] must be provided by the [allocator factory][ListAllocatorFactory]
+/// An [allocator][ListAllocator] must be provided
 /// to allocate memory for the native list.
 ///
 /// ## Example
@@ -72,14 +72,15 @@ public class NativeList implements NativeListView, AutoCloseable {
 
     /// Constructor of [NativeList].
     ///
-    /// @param elementLayout    the memory layout of the element
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    /// @param initialCapacity  the initial capacity of the native list; defaults to 8
+    /// @param elementLayout   the memory layout of the element
+    /// @param allocator       the [allocator][ListAllocator]
+    /// @param initialCapacity the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public NativeList(MemoryLayout elementLayout, ListAllocatorFactory allocatorFactory, long initialCapacity) {
+    /// @since 2.0.0
+    public NativeList(MemoryLayout elementLayout, ListAllocator allocator, long initialCapacity) {
         this.elementLayout = elementLayout;
         this.capacity = initialCapacity;
-        this.allocator = allocatorFactory.create();
+        this.allocator = allocator;
         if (initialCapacity > 0) {
             this.data = allocator.allocate(elementLayout.scale(0, initialCapacity), elementLayout.byteAlignment());
         } else if (initialCapacity != 0) {
@@ -93,36 +94,39 @@ public class NativeList implements NativeListView, AutoCloseable {
     ///
     /// It is recommended to construct a native list with an initial capacity.
     ///
-    /// @param elementLayout    the memory layout of the element
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
+    /// @param elementLayout the memory layout of the element
+    /// @param allocator     the [allocator][ListAllocator]
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    /// @see NativeList#NativeList(MemoryLayout, ListAllocatorFactory, long)
-    public NativeList(MemoryLayout elementLayout, ListAllocatorFactory allocatorFactory) {
-        this(elementLayout, allocatorFactory, 8);
+    /// @see NativeList#NativeList(MemoryLayout, ListAllocator, long)
+    /// @since 2.0.0
+    public NativeList(MemoryLayout elementLayout, ListAllocator allocator) {
+        this(elementLayout, allocator, 8);
     }
 
     /// Constructor of [NativeList].
     ///
     /// This copies element layout and data from `list`.
     ///
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    /// @param list             the source native list
-    public NativeList(ListAllocatorFactory allocatorFactory, NativeList list) {
+    /// @param allocator the [allocator][ListAllocator]
+    /// @param list      the source native list
+    /// @since 2.0.0
+    public NativeList(ListAllocator allocator, NativeList list) {
         this.elementLayout = list.elementLayout;
         this.capacity = list.capacity;
         this.size = list.size;
-        this.allocator = allocatorFactory.create();
+        this.allocator = allocator;
         this.data = allocator.allocateFrom(list.data, elementLayout.byteAlignment());
     }
 
-    /// Creates a new native list with the given allocator factory,
+    /// Creates a new native list with the given allocator,
     /// copies data from `list` and frees up `list`.
     ///
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    /// @param list             the source native list
+    /// @param allocator the [allocator][ListAllocator]
+    /// @param list      the source native list
     /// @return a native list
-    public static NativeList move(ListAllocatorFactory allocatorFactory, NativeList list) {
-        NativeList nativeList = new NativeList(allocatorFactory, list);
+    /// @since 2.0.0
+    public static NativeList move(ListAllocator allocator, NativeList list) {
+        NativeList nativeList = new NativeList(allocator, list);
         list.free();
         return nativeList;
     }

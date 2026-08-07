@@ -5,27 +5,27 @@ import java.util.*;
 /// The `short` specialized version of [NativeList].
 public class ShortNativeList extends NativeList implements ShortNativeListView {
     /// Constructor of [ShortNativeList].
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    /// @param initialCapacity  the initial capacity of the native list; defaults to 8
+    /// @param allocator       the [allocator][ListAllocator]
+    /// @param initialCapacity the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public ShortNativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {
-        super(ValueLayout.JAVA_SHORT, allocatorFactory, initialCapacity);
+    public ShortNativeList(ListAllocator allocator, long initialCapacity) {
+        super(ValueLayout.JAVA_SHORT, allocator, initialCapacity);
     }
     /// Constructor of [ShortNativeList].
     ///
     /// It is recommended to construct a native list with an initial capacity.
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    public ShortNativeList(ListAllocatorFactory allocatorFactory) {
-        super(ValueLayout.JAVA_SHORT, allocatorFactory);
+    /// @param allocator the [allocator][ListAllocator]
+    public ShortNativeList(ListAllocator allocator) {
+        super(ValueLayout.JAVA_SHORT, allocator);
     }
 
     /// Constructor of [ShortNativeList].
     ///
     /// This copies element layout and data from `list`.
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    /// @param list             the source native list
-    public ShortNativeList(ListAllocatorFactory allocatorFactory, ShortNativeList list) {
-        super(allocatorFactory, list);
+    /// @param allocator the [allocator][ListAllocator]
+    /// @param list      the source native list
+    public ShortNativeList(ListAllocator allocator, ShortNativeList list) {
+        super(allocator, list);
     }
 
     @Override public short get(long index) {

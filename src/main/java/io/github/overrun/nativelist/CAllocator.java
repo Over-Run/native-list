@@ -71,7 +71,11 @@ final class CAllocator implements ListAllocator {
     @Override
     public MemorySegment reallocate(MemorySegment segment, long newByteSize, long byteAlignment) {
         ListAllocator.checkSizeAndAlignment(newByteSize, byteAlignment);
-        return realloc(segment, newByteSize).reinterpret(newByteSize);
+        MemorySegment realloc = realloc(segment, newByteSize);
+        if (newByteSize != 0 && realloc.address() == 0) {
+            throw new OutOfMemoryError();
+        }
+        return realloc.reinterpret(newByteSize);
     }
 
     @Override

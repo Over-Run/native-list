@@ -1,3 +1,5 @@
+import io.github.overrun.codegen.base.GeneratedFileCache;
+
 enum Type {
     BOOL("Bool", "ValueLayout.OfBoolean", "ValueLayout.JAVA_BOOLEAN", "boolean", false),
     BYTE("Byte", "ValueLayout.OfByte", "ValueLayout.JAVA_BYTE", "byte", true),
@@ -42,6 +44,14 @@ static final class SB {
     }
 }
 
+GeneratedFileCache cache;
+
+void writeFile(Path path, StringBuilder sb) {
+    if (cache.writeFile(path, sb.toString())) {
+        System.out.println("Wrote: " + path);
+    }
+}
+
 void generateViewClass(Path packageDir, Type type) throws IOException {
     SB sb = new SB();
     sb.appendLine("// This file is auto-generated. DO NOT EDIT!");
@@ -67,7 +77,7 @@ void generateViewClass(Path packageDir, Type type) throws IOException {
 
     sb.appendLine("}");
 
-    Files.writeString(packageDir.resolve(type.prefix + "NativeListView.java"), sb.sb);
+    writeFile(packageDir.resolve(type.prefix + "NativeListView.java"), sb.sb);
 }
 
 void generateClass(Path packageDir, Type type) throws IOException {
@@ -80,30 +90,30 @@ void generateClass(Path packageDir, Type type) throws IOException {
     sb.append("public class ").append(type.prefix).append("NativeList extends NativeList implements ").append(type.prefix).appendLine("NativeListView {");
 
     sb.append("    /// Constructor of [").append(type.prefix).appendLine("NativeList].");
-    sb.appendLine("    /// @param allocatorFactory a factory of the [allocator][ListAllocator]");
-    sb.appendLine("    /// @param initialCapacity  the initial capacity of the native list; defaults to 8");
+    sb.appendLine("    /// @param allocator       the [allocator][ListAllocator]");
+    sb.appendLine("    /// @param initialCapacity the initial capacity of the native list; defaults to 8");
     sb.appendLine("    /// @throws IllegalArgumentException if `initialCapacity < 0`");
-    sb.append("    public ").append(type.prefix).appendLine("NativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {");
-    sb.append("        super(").append(type.valueLayout).appendLine(", allocatorFactory, initialCapacity);");
+    sb.append("    public ").append(type.prefix).appendLine("NativeList(ListAllocator allocator, long initialCapacity) {");
+    sb.append("        super(").append(type.valueLayout).appendLine(", allocator, initialCapacity);");
     sb.append("    }");
     sb.appendLine();
 
     sb.append("    /// Constructor of [").append(type.prefix).appendLine("NativeList].");
     sb.appendLine("    ///");
     sb.appendLine("    /// It is recommended to construct a native list with an initial capacity.");
-    sb.appendLine("    /// @param allocatorFactory a factory of the [allocator][ListAllocator]");
-    sb.append("    public ").append(type.prefix).appendLine("NativeList(ListAllocatorFactory allocatorFactory) {");
-    sb.append("        super(").append(type.valueLayout).appendLine(", allocatorFactory);");
+    sb.appendLine("    /// @param allocator the [allocator][ListAllocator]");
+    sb.append("    public ").append(type.prefix).appendLine("NativeList(ListAllocator allocator) {");
+    sb.append("        super(").append(type.valueLayout).appendLine(", allocator);");
     sb.appendLine("    }");
     sb.appendLine();
 
     sb.append("    /// Constructor of [").append(type.prefix).appendLine("NativeList].");
     sb.appendLine("    ///");
     sb.appendLine("    /// This copies element layout and data from `list`.");
-    sb.appendLine("    /// @param allocatorFactory a factory of the [allocator][ListAllocator]");
-    sb.appendLine("    /// @param list             the source native list");
-    sb.append("    public ").append(type.prefix).append("NativeList(ListAllocatorFactory allocatorFactory, ").append(type.prefix).appendLine("NativeList list) {");
-    sb.appendLine("        super(allocatorFactory, list);");
+    sb.appendLine("    /// @param allocator the [allocator][ListAllocator]");
+    sb.appendLine("    /// @param list      the source native list");
+    sb.append("    public ").append(type.prefix).append("NativeList(ListAllocator allocator, ").append(type.prefix).appendLine("NativeList list) {");
+    sb.appendLine("        super(allocator, list);");
     sb.appendLine("    }");
     sb.appendLine();
 
@@ -181,10 +191,11 @@ void generateClass(Path packageDir, Type type) throws IOException {
     sb.append("    @Override public ").append(type.valueLayoutClass).append(" elementLayout() { return ").append(type.valueLayout).appendLine("; }");
     sb.appendLine("}");
 
-    Files.writeString(packageDir.resolve(type.prefix + "NativeList.java"), sb.sb);
+    writeFile(packageDir.resolve(type.prefix + "NativeList.java"), sb.sb);
 }
 
-void main() throws IOException {
+void main(String[] args) throws IOException {
+    cache = GeneratedFileCache.tryLoad(Path.of("."), Path.of(args[0], ".generator-cache"));
     Path packageDir = Path.of("io/github/overrun/nativelist");
     Files.createDirectories(packageDir);
 
@@ -192,4 +203,5 @@ void main() throws IOException {
         generateViewClass(packageDir, type);
         generateClass(packageDir, type);
     }
+    cache.save();
 }

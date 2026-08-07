@@ -5,27 +5,27 @@ import java.util.*;
 /// The `char` specialized version of [NativeList].
 public class CharNativeList extends NativeList implements CharNativeListView {
     /// Constructor of [CharNativeList].
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    /// @param initialCapacity  the initial capacity of the native list; defaults to 8
+    /// @param allocator       the [allocator][ListAllocator]
+    /// @param initialCapacity the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public CharNativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {
-        super(ValueLayout.JAVA_CHAR, allocatorFactory, initialCapacity);
+    public CharNativeList(ListAllocator allocator, long initialCapacity) {
+        super(ValueLayout.JAVA_CHAR, allocator, initialCapacity);
     }
     /// Constructor of [CharNativeList].
     ///
     /// It is recommended to construct a native list with an initial capacity.
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    public CharNativeList(ListAllocatorFactory allocatorFactory) {
-        super(ValueLayout.JAVA_CHAR, allocatorFactory);
+    /// @param allocator the [allocator][ListAllocator]
+    public CharNativeList(ListAllocator allocator) {
+        super(ValueLayout.JAVA_CHAR, allocator);
     }
 
     /// Constructor of [CharNativeList].
     ///
     /// This copies element layout and data from `list`.
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    /// @param list             the source native list
-    public CharNativeList(ListAllocatorFactory allocatorFactory, CharNativeList list) {
-        super(allocatorFactory, list);
+    /// @param allocator the [allocator][ListAllocator]
+    /// @param list      the source native list
+    public CharNativeList(ListAllocator allocator, CharNativeList list) {
+        super(allocator, list);
     }
 
     @Override public char get(long index) {

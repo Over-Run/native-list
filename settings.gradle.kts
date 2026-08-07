@@ -1,3 +1,3 @@
 rootProject.name = "native-list"
 
-include("gen")
+include("gen", "module:lwjgl")

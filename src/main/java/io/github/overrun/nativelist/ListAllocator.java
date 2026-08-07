@@ -1,6 +1,5 @@
 package io.github.overrun.nativelist;
 
-import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 
 /// Provides methods for [NativeList] to allocate memory.
@@ -54,27 +53,6 @@ public interface ListAllocator {
     ///
     /// @param segment the memory segment to be released, which **may** be [MemorySegment#NULL]
     void free(MemorySegment segment);
-
-    /// Creates an allocator with the [confined arena][Arena#ofConfined()].
-    ///
-    /// @return the allocator
-    static ListAllocator ofConfinedArena() {
-        return ArenaAllocator.ofConfined();
-    }
-
-    /// Creates an allocator with the [shared arena][Arena#ofShared()].
-    ///
-    /// @return the allocator
-    static ListAllocator ofSharedArena() {
-        return ArenaAllocator.ofShared();
-    }
-
-    /// Creates an allocator with the [auto arena][Arena#ofAuto()].
-    ///
-    /// @return the allocator
-    static ListAllocator ofAutoArena() {
-        return ArenaAllocator.ofAuto();
-    }
 
     /// Creates an allocator with C `malloc`, `realloc` and `free`.
     ///

@@ -1,36 +1,64 @@
-import org.jreleaser.model.Active
-
 plugins {
-    `java-library`
     idea
-    `maven-publish`
-    id("org.jreleaser") version "1.25.0"
+    id("module-conventions")
 }
 
-group = "io.github.over-run"
-version = "1.1.0"
+version = providers.gradleProperty("projectVersion").get()
 
-repositories {
-    mavenCentral()
+val lwjglNatives = Pair(
+    System.getProperty("os.name")!!,
+    System.getProperty("os.arch")!!
+).let { (name, arch) ->
+    when {
+        "FreeBSD" == name ->
+            "natives-freebsd"
+
+        arrayOf("Linux", "SunOS", "Unix").any { name.startsWith(it) } ->
+            if (arrayOf("arm", "aarch64").any { arch.startsWith(it) })
+                "natives-linux${if (arch.contains("64") || arch.startsWith("armv8")) "-arm64" else "-arm32"}"
+            else if (arch.startsWith("ppc"))
+                "natives-linux-ppc64le"
+            else if (arch.startsWith("riscv"))
+                "natives-linux-riscv64"
+            else
+                "natives-linux"
+
+        arrayOf("Mac OS X", "Darwin").any { name.startsWith(it) } ->
+            "natives-macos${if (arch.startsWith("aarch64")) "-arm64" else ""}"
+
+        arrayOf("Windows").any { name.startsWith(it) } ->
+            if (arch.contains("64"))
+                "natives-windows${if (arch.startsWith("aarch64")) "-arm64" else ""}"
+            else
+                "natives-windows-x86"
+
+        else ->
+            throw Error("Unrecognized or unsupported platform. Please set \"lwjglNatives\" manually")
+    }
+}
+
+moduleInfoExtension {
+    artifactId = "native-list"
+    publicationName = "Native List"
+    publicationDescription = "Native list is a resizable array backed by memory segment."
 }
 
 dependencies {
     api("org.jspecify:jspecify:1.0.0")
 
-    testImplementation(platform("org.junit:junit-bom:6.0.2"))
+    testImplementation(platform("org.junit:junit-bom:6.1.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    testImplementation(testFixtures(project(":module:lwjgl")))
+    testImplementation(variantOf(libs.lwjgl3) {
+        classifier(lwjglNatives)
+    })
 }
 
 tasks.test {
     useJUnitPlatform()
     jvmArgs("--enable-native-access=ALL-UNNAMED")
-}
-
-tasks.withType<Javadoc> {
-    options {
-        jFlags("-Duser.language=en")
-    }
 }
 
 sourceSets {
@@ -45,90 +73,5 @@ sourceSets {
 idea {
     module {
         generatedSourceDirs.add(file("src/main/generated"))
-    }
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }
-
-    withSourcesJar()
-    withJavadocJar()
-}
-
-tasks.withType<JavaCompile> {
-    options.release = 25
-}
-
-publishing.repositories {
-    maven {
-        name = "staging"
-        url = uri(layout.buildDirectory.dir("staging-deploy"))
-    }
-}
-
-publishing.publications {
-    register<MavenPublication>("mavenPublication") {
-        groupId = project.group.toString()
-        artifactId = "native-list"
-        version = project.version.toString()
-        from(components["java"])
-        pom {
-            name = "Native List"
-            description = "Native list is a resizable array backed by memory segment."
-            url = "https://github.com/Over-Run/native-list"
-            licenses {
-                license {
-                    name = "MIT License"
-                    url = "https://raw.githubusercontent.com/Over-Run/native-list/refs/heads/main/LICENSE"
-                }
-            }
-            developers {
-                developer {
-                    name = "squid233"
-                    organization = "Overrun Organization"
-                    organizationUrl = "https://github.com/Over-Run"
-                }
-            }
-            scm {
-                connection = "scm:git:git://github.com/Over-Run/native-list.git"
-                developerConnection = "scm:git:ssh://github.com:Over-Run/native-list.git"
-                url = "https://github.com/Over-Run/native-list"
-            }
-        }
-    }
-}
-
-jreleaser {
-    signing {
-        pgp {
-            active = Active.ALWAYS
-            armored = true
-        }
-    }
-    deploy {
-        maven {
-            mavenCentral {
-                mavenCentral {
-                    register("release-deploy") {
-                        active = Active.RELEASE
-                        url = "https://central.sonatype.com/api/v1/publisher"
-                        stagingRepository("build/staging-deploy")
-                    }
-                }
-                nexus2 {
-                    register("snapshot-deploy") {
-                        active = Active.SNAPSHOT
-                        snapshotUrl = "https://central.sonatype.com/repository/maven-snapshots/"
-                        applyMavenCentralRules = true
-                        snapshotSupported = true
-                        closeRepository = true
-                        releaseRepository = true
-                        stagingRepository("build/staging-deploy")
-                    }
-                }
-            }
-        }
     }
 }

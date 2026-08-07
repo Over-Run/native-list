@@ -5,27 +5,27 @@ import java.util.*;
 /// The `MemorySegment` specialized version of [NativeList].
 public class AddressNativeList extends NativeList implements AddressNativeListView {
     /// Constructor of [AddressNativeList].
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    /// @param initialCapacity  the initial capacity of the native list; defaults to 8
+    /// @param allocator       the [allocator][ListAllocator]
+    /// @param initialCapacity the initial capacity of the native list; defaults to 8
     /// @throws IllegalArgumentException if `initialCapacity < 0`
-    public AddressNativeList(ListAllocatorFactory allocatorFactory, long initialCapacity) {
-        super(ValueLayout.ADDRESS, allocatorFactory, initialCapacity);
+    public AddressNativeList(ListAllocator allocator, long initialCapacity) {
+        super(ValueLayout.ADDRESS, allocator, initialCapacity);
     }
     /// Constructor of [AddressNativeList].
     ///
     /// It is recommended to construct a native list with an initial capacity.
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    public AddressNativeList(ListAllocatorFactory allocatorFactory) {
-        super(ValueLayout.ADDRESS, allocatorFactory);
+    /// @param allocator the [allocator][ListAllocator]
+    public AddressNativeList(ListAllocator allocator) {
+        super(ValueLayout.ADDRESS, allocator);
     }
 
     /// Constructor of [AddressNativeList].
     ///
     /// This copies element layout and data from `list`.
-    /// @param allocatorFactory a factory of the [allocator][ListAllocator]
-    /// @param list             the source native list
-    public AddressNativeList(ListAllocatorFactory allocatorFactory, AddressNativeList list) {
-        super(allocatorFactory, list);
+    /// @param allocator the [allocator][ListAllocator]
+    /// @param list      the source native list
+    public AddressNativeList(ListAllocator allocator, AddressNativeList list) {
+        super(allocator, list);
     }
 
     @Override public MemorySegment get(long index) {

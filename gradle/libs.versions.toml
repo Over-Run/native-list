@@ -1,0 +1,7 @@
+[versions]
+codegen-base = "1.0.0"
+lwjgl3 = "3.4.2"
+
+[libraries]
+codegenBase = { module = "io.github.over-run:codegen-base", version.ref = "codegen-base" }
+lwjgl3 = { module = "org.lwjgl:lwjgl", version.ref = "lwjgl3" }
